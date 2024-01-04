@@ -621,123 +621,123 @@ Module Matching(pt : PatTermsSymb).
                (M' : 
                  forall (tpg2 : matching_tuple),
                    matching_tuple_order g1 tpg2 (t, (inhole_pat pc ph, g2)) ->
-                   mtch_powset_ev (matching_tuple_term tpg2)) : 
+                   mtch_powset_ev (matching_tuple_term tpg2)) :
       mtch_powset_ev t :=
-        (fold_left 
-           (* (@app mtch) : ++ with type 
+       fold_left 
+         (* (@app mtch) : ++ with type 
               list  mtch -> list mtch -> list mtch *)
-           (@app (mtch_ev t))
-           (* iteration over the result of the recursive call over 
+         (@app (mtch_ev t))
+         (* iteration over the result of the recursive call over 
               (pc, t) *)
-           (map 
-              (fun mtch1 : (mtch_ev t) =>
-                 match mtch1 in (mtch_ev t') 
-                       return t = t' -> (mtch_powset_ev t) with
-                 | mtch_pair t' dec_t bc =>
+         (map 
+            (fun mtch1 : (mtch_ev t) =>
+               match mtch1 in (mtch_ev t') 
+                     return t = t' -> (mtch_powset_ev t) with
+               | mtch_pair t' dec_t bc =>
                    fun eqp' : t = t' =>
                      (match dec_t in (decom_ev t'') return
                             t = t'' -> (mtch_powset_ev t) with
                       | nonempty_d_ev t'' c tc ev_tc_subt =>
-                        fun eqp'': t = t'' =>
-                          match ev_tc_subt with
-                          | left (conj Heq_t Heq_con) =>
-                            (*  pattern pc generates hole, hence tc = t: 
+                          fun eqp'': t = t'' =>
+                            match ev_tc_subt with
+                            | left (conj Heq_t Heq_con) =>
+                                (*  pattern pc generates hole, hence tc = t: 
                                 recursive call over M(ph, t), for every ph
                                 returned by call to M(pc, t) *)
-                            fold_left
-                               (* (@app mtch) : ++ with type  *)
-                               (* list mtch ->    list mtch -> list mtch *)
-                               (@app (mtch_ev t))
-                               (map
-                                  (fun mtch2 : mtch_ev t =>
-                                     (match mtch2 in (mtch_ev t''') return 
-                                            t = t''' -> (mtch_powset_ev t)
-                                      with
-                                      | mtch_pair t''' dh bh =>
-                                        fun eqp''' : t = t''' =>
-                                          let union := (b_union bc
-                                                                bh) in
-                                          match union with
-                                          | None => nil (* match failed  *)
-                                          | Some b    =>
-                                            (mtch_pair 
-                                               t 
-                                               (* decom returned by call to 
+                                fold_left
+                                  (* (@app mtch) : ++ with type  *)
+                                  (* list mtch ->    list mtch -> list mtch *)
+                                  (@app (mtch_ev t))
+                                  (map
+                                     (fun mtch2 : mtch_ev t =>
+                                        (match mtch2 in (mtch_ev t''') return 
+                                               t = t''' -> (mtch_powset_ev t)
+                                         with
+                                         | mtch_pair t''' dh bh =>
+                                             fun eqp''' : t = t''' =>
+                                               let union := (b_union bc
+                                                               bh) in
+                                               match union with
+                                               | None => nil (* match failed  *)
+                                               | Some b    =>
+                                                   (mtch_pair 
+                                                      t 
+                                                      (* decom returned by call to 
                                                 (M, in-hole)  *)
-                                               (combine t c t'''
-                                                        (* evidence of {tc = t} +
+                                                      (combine t c t'''
+                                                         (* evidence of {tc = t} +
                                                          {subterm_rel tc t} *)  
-                                                        (inhole_eq1 t t''' c eqp''' Heq_con)
-                                                        dh) 
-                                            b) :: nil
-                                          end
-                                      end eq_refl)
-                                  )
-                                  (* pat_gen_hole pc g1 => recursive call over 
+                                                         (inhole_eq1 t t''' c eqp''' Heq_con)
+                                                         dh) 
+                                                      b) :: nil
+                                               end
+                                         end eq_refl)
+                                     )
+                                     (* pat_gen_hole pc g1 => recursive call over 
                                    (ph, t), no consumption of input, same  
                                    grammar g2 *)
-                                  (M' (t, (ph, g2))
-                                      (matching_tuple_order_pat_evol g1 t
-                                         (ph, g2) 
-                                         (inhole_pat pc ph, g2)
-                                         (pat_grammar_evolution_inhole_right 
-                                            g2 pc ph)))
-                               )
-                             nil
-                          | right proof_subt =>
-                            (*  pattern pc does not generate hole, hence 
+                                     (M' (t, (ph, g2))
+                                        (matching_tuple_order_pat_evol g1 t
+                                           (ph, g2) 
+                                           (inhole_pat pc ph, g2)
+                                           (pat_grammar_evolution_inhole_right 
+                                              g2 pc ph)))
+                                  )
+                                  nil
+                            | right proof_subt =>
+                                (*  pattern pc does not generate hole, hence 
                                 subterm_rel tc t: 
                                 recursive call over M(ph, tc), for every ph
                                 returned by call to M(pc, t) *)
-                            (fold_left
-                              (* (@app mtch) : ++ with type  *)
-                              (* list mtch ->    list mtch -> list mtch *)
-                              (@app (mtch_ev t))
-                              (map
-                                 (fun mtch2 : mtch_ev tc =>
-                                    (match mtch2 in (mtch_ev tc') return 
-                                           tc = tc' -> (mtch_powset_ev t)
-                                     with
-                                     | mtch_pair tc' dh bh =>
-                                       fun eqp''' : tc = tc' =>
-                                         let union := (b_union bc
+                                fold_left
+                                  (* (@app mtch) : ++ with type  *)
+                                  (* list mtch ->    list mtch -> list mtch *)
+                                  (@app (mtch_ev t))
+                                  (map
+                                     (fun mtch2 : mtch_ev tc =>
+                                        (match mtch2 in (mtch_ev tc') return 
+                                               tc = tc' -> (mtch_powset_ev t)
+                                         with
+                                         | mtch_pair tc' dh bh =>
+                                             fun eqp''' : tc = tc' =>
+                                               let union := (b_union bc
                                                                bh) in
-                                         match union with
-                                         | None      => nil
-                                         | Some b    => 
-                                         (mtch_pair 
-                                            t
-                                            (* decom returned by call to 
+                                               match union with
+                                               | None      => nil
+                                               | Some b    => 
+                                                   (mtch_pair 
+                                                      t
+                                                      (* decom returned by call to 
                                                (M, in-hole)  *)      
-                                            (combine t c tc 
-                                                     (* evidence of {tc = t} + 
+                                                      (combine t c tc 
+                                                         (* evidence of {tc = t} + 
                                                         {subterm_rel tc t} *)
-                                                     (inhole_eq2 eqp'' 
-                                                                 proof_subt)
-                                            (inhole_subterm tc tc'
+                                                         (inhole_eq2 eqp'' 
+                                                            proof_subt)
+                                                         (inhole_subterm tc tc'
                                                             eqp''' dh))
-                                            b) :: nil
-                                         end
-                                     end eq_refl))
-                                 (* recursive call over (ph, tc), consumption 
+                                                      b) :: nil
+                                               end
+                                         end eq_refl))
+                                     (* recursive call over (ph, tc), consumption 
                                     of input *)
-                                 (M' (tc, (ph, g1))
-                                     (rec_call_right_pat_decre t t'' pc ph g1 g2
-                                                               tc eqp'' 
-                                                               proof_subt)))
-                              nil)
-                          end
+                                     (M' (tc, (ph, g1))
+                                        (rec_call_right_pat_decre t t'' pc ph g1 g2
+                                           tc eqp'' 
+                                           proof_subt)))
+                                  nil
+                            end
                       | _ => fun eqp : _ => nil
                       end
                         (* ev. that t = t' *)
                         eqp')
-                 end eq_refl)
-              (* recursive call over (pc, t) *)
-              (M' (t, (pc, g2))
-                  (matching_tuple_order_pat_evol
-                     g1 t (pc, g2) (inhole_pat pc ph, g2)
-                     (pat_grammar_evolution_inhole_left g2 pc ph))))
-           nil).
+               end eq_refl)
+            (* recursive call over (pc, t) *)
+            (M' (t, (pc, g2))
+               (matching_tuple_order_pat_evol
+                  g1 t (pc, g2) (inhole_pat pc ph, g2)
+                  (pat_grammar_evolution_inhole_left g2 pc ph))))
+         nil.
     
     (* *********************************************************** *)
     (* name_case *)
@@ -900,6 +900,11 @@ Module Matching(pt : PatTermsSymb).
     Defined.
 
     (* fourth equation *)
+    Definition build_subterm_proof (tr : term) (tl : list_term) : subterms (ct tr tl) tr tl.
+      unfold subterms.
+      eauto.
+    Defined.
+      
     Lemma M_ev_fourth_eq : 
       forall (g1 g2 : grammar)
         (tpg1 : matching_tuple)

@@ -226,9 +226,9 @@ Section ListLibExt.
     intros A.
     induction l.
     + intros acc.
-    simpl.
-    rewrite <- app_nil_end.
-    reflexivity.
+      simpl.
+      rewrite app_nil_r.
+      reflexivity.
     + intros acc.
     simpl.
     assert(fold_left (app (A:= A)) l a =

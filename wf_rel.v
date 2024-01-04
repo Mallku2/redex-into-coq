@@ -585,11 +585,28 @@ Module WfRel(pt : PatTermsSymb).
         }
       
         assert (Decision (∃ l : lit, (t, p) = (lter l, lp l))) as HeqDecLit.
-        {apply (exists_dec (EqDecision0 := lit_eq_dec) (H := lit_finite)).
-         intro x.
-         apply prod_eq_dec.
+        {unfold Decision.
+         destruct t, p;
+           solve[right;
+                 intros [l' Heq];
+                 inversion Heq
+                | (* lit  *)
+                  match goal with
+                  | [l1 : lit, l2 : lit |- _] =>
+                      destruct (lit_eq_dec l1 l2)
+                  end;
+                 [(* = *)
+                   left;
+                   subst;
+                   eauto
+                 | (* <> *)
+                   right;
+                   intros [l' Heq];
+                   inversion Heq;
+                   subst;
+                   auto] ].
         }
-      
+        
         apply or_dec;
           assumption.
       Defined.

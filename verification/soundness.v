@@ -162,7 +162,7 @@ Module Soundness (pt : PatTermsSymb).
                     intuition.
                  ++ (* t = cons *)
                     generalize (M_ev_rew_cons_case G1 G2 t l0 p l).
-                    intros [Hsubt Heq].
+                    intro Heq.
                     rewrite Heq.
                     intro Hin_cons.
                     apply M_ev_cons_case_pair_in in Hin_cons.
@@ -436,7 +436,7 @@ Module Soundness (pt : PatTermsSymb).
                     intuition.
                  ** (* list *)
                     generalize (M_ev_rew_cons_case G1 G2 t l' p l).
-                    intros [Hproof_subt Heq].
+                    intros Heq.
                     rewrite Heq.
                     intro Hin_cons.
                     apply M_ev_cons_case_nonempty_pair_in in Hin_cons.

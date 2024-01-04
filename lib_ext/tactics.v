@@ -78,6 +78,12 @@ Ltac intro_eq_hyp :=
       not_hyp (N1 <> N2);
       not_hyp (N2 <> N1);
       destruct (PeanoNat.Nat.eq_dec N1 N2)
+  | [ S1 : string, S2 : string |- _ ]          =>
+      not_hyp (S1 = S2);
+      not_hyp (S2 = S1);
+      not_hyp (S1 <> S2);
+      not_hyp (S2 <> S1);
+      destruct (string_dec S1 S2)
   | [ IH : forall e2 : ?T, {?E1 = e2} + {?E1 <> e2} |- _] =>
       match goal with
       (* do not add eq hypotheses for some term for which there

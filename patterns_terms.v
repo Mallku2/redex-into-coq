@@ -35,12 +35,6 @@ Module Type Symbols.
   Parameter lit_eq_dec : EqDecision lit.
   #[global] Hint Resolve lit_eq_dec : terms_pats_db.
 
-   (* lits and nonterms are finite *)
-  Parameter lit_finite : Finite (EqDecision0 := lit_eq_dec) lit.
-  #[global] Hint Resolve lit_finite : terms_pats_db.
-  Parameter nonterm_finite : Finite (EqDecision0 := nonterm_eq_dec) nonterm.
-  #[global] Hint Resolve nonterm_finite : terms_pats_db.
-
 End Symbols.
 
 (* from a given set of symbols, we instantiate a language of terms and
@@ -115,6 +109,11 @@ Module Type PatTerms (S : Symbols).
   
   Notation "'cp' p1 p2" := (list_pat_c (cons_pat_c p1 p2))
                              (at level 50, p1 at level 9).
+
+  (* list of patterns: notation to simplify syntax *)
+  Notation "'(|' p1 p2 '|)'" := (list_pat_c 
+                                     (cons_pat_c p1 (cons_pat_c p2 nil_pat_c)))
+                             (at level 50, p1 at level 9).
   
   Notation "C [ e ]" := (inhole_pat C e) (at level 50).
   
@@ -134,6 +133,10 @@ Module Type PatTerms (S : Symbols).
   Notation "'ct' t1 t2 " := (list_term_c (cons_term_c t1 t2))
                               (at level 50, t1 at level 9).
   
+  Notation "'(||' t1 t2 '||)'" := (list_term_c 
+                                     (cons_term_c t1 (cons_term_c t2 nil_term_c)))
+                             (at level 50, t1 at level 9).
+
   Notation "'hole'" := (contxt_term hole_contxt_c).
 
   Notation "'ctxt' C" := (contxt_term C)

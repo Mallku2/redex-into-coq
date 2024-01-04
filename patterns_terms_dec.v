@@ -241,7 +241,7 @@ Module PatTermsDec (pt : PatTermsSymb).
       intros x y.
       unfold Decision.
       solve_eq_2_mut_rec pat list_pat pat_mut_rec.
-    Qed.
+    Defined.
 
     Hint Resolve pat_eq_dec : terms_pats_dec_db.
     
@@ -255,7 +255,7 @@ Module PatTermsDec (pt : PatTermsSymb).
       unfold Decision.
       
       solve_eq_4_mut_rec term list_term contxt list_contxt term_mut_rec.
-    Qed.
+    Defined.
 
     Hint Resolve term_eq_dec : terms_pats_dec_db.
 
@@ -265,7 +265,7 @@ Module PatTermsDec (pt : PatTermsSymb).
       intros x y.
       unfold Decision.
       solve_eq_4_mut_rec term list_term contxt list_contxt contxt_mut_rec.
-    Qed.
+    Defined.
 
     Hint Resolve contxt_eq_dec : terms_pats_dec_db.
 
@@ -275,7 +275,7 @@ Module PatTermsDec (pt : PatTermsSymb).
       intros x y.
       unfold Decision.
       solve_eq_4_mut_rec term list_term contxt list_contxt list_contxt_mut_rec.
-    Qed.
+    Defined.
 
     Hint Resolve contxt_eq_dec : terms_pats_dec_db.
 
@@ -286,7 +286,7 @@ Module PatTermsDec (pt : PatTermsSymb).
       unfold Decision.
       
       solve_eq_4_mut_rec term list_term contxt list_contxt list_term_mut_rec.    
-    Qed.
+    Defined.
 
     Hint Resolve list_term_eq_dec : terms_pats_dec_db.
     

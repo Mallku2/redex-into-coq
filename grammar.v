@@ -143,7 +143,7 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
   Lemma grammar_eq_dec : forall (g1 g2 : grammar), {g1 = g2} + {g1 <> g2}.
   Proof.
     apply list_prod_eq_dec.
-  Qed.
+  Defined.
     
 
   (* ********************************* *)

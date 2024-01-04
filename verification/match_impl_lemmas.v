@@ -159,6 +159,61 @@ Module MatchImplLemmas (pt : PatTermsSymb).
      unfold eq_rect_r;
      repeat (rewrite <- eq_rect_eq)
     |apply fix_eq_fun_ext].
+  
+  
+  Ltac M_reduce :=
+    unfold M;
+    repeat (repeat M_ev_reduce;
+            unfold eq_rec_r;
+            repeat (rewrite <- Eqdep.EqdepTheory.eq_rec_eq);
+            try (unfold inhole_case);
+            try (unfold nt_case)).
+
+  (*******************)
+  (* lit pat *)
+  (*******************)
+  Lemma M_ev_rew_lit_case : 
+  forall (g1 g2 : grammar) (l : lit),
+    M_ev g1 (lit_term l, (lit_pat l, g2)) = 
+      cons (mtch_pair (lit_term l)
+                               (* case same literals: (∙, ∅) *)
+                               (empty_d_ev (lit_term l))
+                               nil)
+                    nil.
+  Proof.
+    intros g1 g2 l.
+    M_ev_reduce.
+    destruct (lit_eq_dec l l) as [Heq | Hneq].
+    - (* = *)
+      unfold eq_rec_r.
+      rewrite <- Eqdep.EqdepTheory.eq_rec_eq.
+      reflexivity.
+    - (* <> *)
+      assert(l = l).
+      {reflexivity.
+      }
+
+      contradiction.
+  Qed.
+  
+  (*******************)
+  (* nil pat *)
+  (*******************)
+  Lemma M_ev_rew_nil_case : 
+  forall (g1 g2 : grammar),
+    M_ev g1 (list_term_c nil_term_c, (list_pat_c nil_pat_c, g2)) = 
+      cons (mtch_pair (list_term_c nil_term_c)
+                     (* case same literals: (∙, ∅) *)
+                     (empty_d_ev (list_term_c nil_term_c))
+                     nil)
+               nil.
+  Proof.
+    intros g1 g2.
+    M_ev_reduce.
+    unfold eq_rec_r.
+    rewrite <- Eqdep.EqdepTheory.eq_rec_eq.
+    reflexivity.
+  Qed.
 
   (*******************)
   (* hole pat *)
@@ -264,29 +319,22 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   Defined.
 
   Lemma M_ev_rew_name_case : 
-    forall (g1 g2 : grammar) (t : term) (p : pat) (x : var)
-      (eqp : matching_tuple_inverted (t, (name_pat x p, g2)) =
-             ((name_pat x p, g2), t)),
+    forall (g1 g2 : grammar) (t : term) (p : pat) (x : var),
       M_ev g1 (t, (name_pat x p, g2))
       =
       name_case (matching_tuple_term (t, (name_pat x p, g2)))
                  (* TODO: check if we can get rid of M_ev_sixth_eq_trans2 *)
-                 (M_ev_sixth_eq_trans2
-                    (t, (name_pat x p, g2)) g1 g2 t p x eqp
-                    (M_ev g1 (t, (p, g2))))
+                 (* (M_ev_sixth_eq_trans2 *)
+                 (*    (t, (name_pat x p, g2)) g1 g2 t p x eqp *)
+                 (*    (M_ev g1 (t, (p, g2)))) *)
+                 (M_ev g1 (t, (p, g2)))
                  x.
   Proof.
     intros.
+
     simpl.
-    simpl in eqp.
     remember (name_case _ _ _) as rhs eqn:Heq_rhs.
 
-    assert(Heq: eqp = eq_refl).
-    {apply UIP_refl.
-    }
-    
-    rewrite Heq in Heq_rhs.
-    
     (* unfold M_ev. *)
     unfold M_ev.
     rewrite Fix_eq.
@@ -300,6 +348,30 @@ Module MatchImplLemmas (pt : PatTermsSymb).
      apply fix_eq_fun_ext.
   Qed.
 
+  (*   intros. *)
+  (*   simpl. *)
+  (*   simpl in eqp. *)
+  (*   remember (name_case _ _ _) as rhs eqn:Heq_rhs. *)
+
+  (*   assert(Heq: eqp = eq_refl). *)
+  (*   {apply UIP_refl. *)
+  (*   } *)
+    
+  (*   rewrite Heq in Heq_rhs. *)
+    
+  (*   (* unfold M_ev. *) *)
+  (*   unfold M_ev. *)
+  (*   rewrite Fix_eq. *)
+  (*   + (* Fixpoint def *) *)
+  (*     unfold M_ev_body. *)
+  (*     simpl. *)
+  (*     rewrite Heq_rhs. *)
+  (*     reflexivity. *)
+  (*  + (* prove hypothesis of Fix_eq: function extensionality over recursive  *)
+  (*       cases *) *)
+  (*    apply fix_eq_fun_ext. *)
+  (* Qed. *)
+
   Lemma M_ev_name_case_in : 
     forall (g1 g2 : grammar) (t : term) (p : pat) (v : var) (b : bindings),
     In (mtch_pair t (empty_d_ev t) b) (M_ev g1 (t, (name v p, g2))) ->
@@ -308,17 +380,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           Some b = b_union ((v, (named t (empty_d_ev t))) :: nil) b'.
   Proof.
     intros g1 g2 t p v b H.
-    assert(eqp: matching_tuple_inverted (t, (name_pat v p, g2)) =
-                  ((name_pat v p, g2), t)).
-    {reflexivity.
-    }
-    rewrite (M_ev_rew_name_case _ _ _ _ _ eqp) in H.
+    rewrite (M_ev_rew_name_case _ _ _ _ _) in H.
     simpl in H.
     unfold M_ev_sixth_eq_trans2 in H.
-    assert(Hrefl : eqp = eq_refl).
-    {apply UIP_refl.
-    }
-    rewrite Hrefl in H.
     unfold eq_rec_r in H.
     repeat (rewrite <- eq_rect_eq in H).
     repeat (rewrite <- eq_rec_eq in H).
@@ -385,17 +449,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           Some b = b_union ((v, contxt_term c) :: ∅) b'.
   Proof.
     intros g1 g2 t sub_t c p v ev_decom b H.
-    assert(eqp: matching_tuple_inverted (t, (name_pat v p, g2)) =
-                  ((name_pat v p, g2), t)).
-    {reflexivity.
-    }
-    rewrite (M_ev_rew_name_case _ _ _ _ _ eqp) in H.
+    rewrite (M_ev_rew_name_case _ _ _ _ _) in H.
     simpl in H.
     unfold M_ev_sixth_eq_trans2 in H.
-    assert(Hrefl : eqp = eq_refl).
-    {apply UIP_refl.
-    }
-    rewrite Hrefl in H.
     unfold eq_rec_r in H.
     repeat (rewrite <- eq_rect_eq in H).
     repeat (rewrite <- eq_rec_eq in H).
@@ -607,10 +663,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   Lemma M_ev_rew_cons_case :
     forall (g1 g2 : grammar) (tl : term) (tr : list_term) (pl : pat) (pr : list_pat),
-      exists (proof_subt : subterms (ct tl tr) tl tr),
-        M_ev g1 (ct tl tr, (cp pl pr, g2))
-        =
-        cons_case (ct tl tr) tl tr proof_subt
+      M_ev g1 (ct tl tr, (cp pl pr, g2))
+      =
+        cons_case (ct tl tr) tl tr (build_subterm_proof tl tr)
           (M_ev g1 (tl, (pl, g1)))
           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
   Proof.
@@ -626,8 +681,6 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       rewrite <- eq_rect_eq.
       fold (M_ev g1 (tl, (pl, g1))).
       fold (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
-      remember (or_introl _) as Hsubt.
-      exists Hsubt.
       unfold eq_rec_r.
       repeat (rewrite <- eq_rec_eq).
       reflexivity.

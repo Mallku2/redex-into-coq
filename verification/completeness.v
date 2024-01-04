@@ -61,32 +61,10 @@ Module Completeness (pt : PatTermsSymb).
       (* we show that
             In (mtch_pair t0 (empty_d_ev t0) bp)
                (M_ev (m_rel_e (g, t0) (p0, g'))*)
-      assert(matching_tuple_inverted (t0, (name x p0, g')) =
-               (name x p0, g', t0)) as Heqproj.
-      {reflexivity.
-      }
-      rewrite (M_ev_rew_name_case g g' t0 p0 x Heqproj).
-
-      assert(forall (mpair : mtch_ev t0)
-               (mset : mtch_powset_ev (matching_tuple_term (t0, (p0, g')))),
-                In mpair mset ->
-                In mpair (M_ev_sixth_eq_trans2
-                            (t0, (name_pat x p0, g')) g g' t0 p0 x
-                            Heqproj mset)) as Hinmpair.
-      {intros mpair mset Hin.
-       unfold M_ev_sixth_eq_trans2.
-       assert(Heqproj = eq_refl) as H6.
-       {apply UIP_refl.
-       }
-       rewrite H6.
-       simpl.
-       exact Hin.
-      }
+      rewrite (M_ev_rew_name_case g g' t0 p0 x).
 
       assert(In (mtch_pair t0 (empty_d_ev t0) bp)
-                (M_ev_sixth_eq_trans2
-                   (t0, (name_pat x p0, g')) g g' t0 p0 x Heqproj
-                   (M_ev g (t0, (p0, g')))))
+                   (M_ev g (t0, (p0, g'))))
         as Hinpair_inst.
       {assert(matching_tuple_order g
                 (t0, (p0, g'))
@@ -109,22 +87,16 @@ Module Completeness (pt : PatTermsSymb).
                  sub_t bp C).
        }
        inversion Happ as [Hmatch_spec Hdecom].
-
-       apply (Hinmpair (mtch_pair t0 (empty_d_ev t0) bp)
-                       (M_ev g (t0, (p0, g')))
-                       (Hmatch_spec Hmatch)).
+       apply (Hmatch_spec Hmatch).
       }
 
       (* now we show the effect of name_case over
             (mtch_pair t0 (empty_d_ev t0) bp) *)
-      remember (M_ev_sixth_eq_trans2
-                  (t0, (name x p0, g')) g g' t0 p0 x
-                  Heqproj
-                  (M_ev g (t0, (p0, g')))) as rec_set.
 
-      assert(exists l1 l2, rec_set = l1 ++ (mtch_pair t0 (empty_d_ev t0) bp) :: l2)
+      assert(exists l1 l2, M_ev g (t0, (p0, g')) = l1 ++ (mtch_pair t0 (empty_d_ev t0) bp) :: l2)
         as Hrec_set_split.
       {apply in_split.
+       
        exact Hinpair_inst.
       }
       inversion Hrec_set_split as [l1 Hrec_set_split'].
@@ -313,17 +285,14 @@ Module Completeness (pt : PatTermsSymb).
              Hmatch1 Hmatch2 H2.
 
       (* express M_ev in terms of function cons_case *)
-      assert(exists (proof_subt : subterms (ct t1 t2) t1 t2),
-                M_ev g (ct t1 t2, (cp p1 p2, g'))
-                =
-                (cons_case (ct t1 t2) t1 t2 proof_subt
-                           (M_ev g (t1, (p1, g)))
-                           (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+      assert(M_ev g (ct t1 t2, (cp p1 p2, g'))
+             =
+               cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
+                 (M_ev g (t1, (p1, g)))
+                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
         as Hrec_call.
       {apply M_ev_rew_cons_case.
       }
-      inversion Hrec_call as [proof_subt Hrec_call'].
-      clear Hrec_call.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair t1 (empty_d_ev t1) b1)
@@ -408,24 +377,24 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t2'.
       clear Hin_t2.
 
-      rewrite Hsplit_t1'' in Hrec_call'.
+      rewrite Hsplit_t1'' in Hrec_call.
       clear Hsplit_t1''.
-      rewrite Hsplit_t2'' in Hrec_call'.
+      rewrite Hsplit_t2'' in Hrec_call.
       clear Hsplit_t2''.
 
       (* compute with cons_case over the mtch_pairs of interest *)
-      rewrite cons_case_dist in Hrec_call'.
+      rewrite cons_case_dist in Hrec_call.
 
       assert(exists res : mtch_powset_ev (ct t1 t2),
-                cons_case (ct t1 t2) t1 t2 proof_subt
+                cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
                           (mtch_pair t1 (empty_d_ev t1) b1 :: l2_t1)
                           (l1_t2 ++ mtch_pair t2 (empty_d_ev t2) b2 :: l2_t2)
                 =
                 res ++
-                    cons_case_aux (ct t1 t2) t1 t2 proof_subt
+                    cons_case_aux (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
                     (mtch_pair t1 (empty_d_ev t1) b1)
                     (mtch_pair t2 (empty_d_ev t2) b2 :: l2_t2) ++
-                    cons_case (ct t1 t2) t1 t2 proof_subt l2_t1
+                    cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2) l2_t1
                     (l1_t2 ++ mtch_pair t2 (empty_d_ev t2)
                            b2 :: l2_t2))
         as Hcons_case_dist_unfold.
@@ -434,10 +403,10 @@ Module Completeness (pt : PatTermsSymb).
 
       inversion Hcons_case_dist_unfold as [res Hcons_case_dist_unfold'].
       clear Hcons_case_dist_unfold.
-      rewrite Hcons_case_dist_unfold' in Hrec_call'.
+      rewrite Hcons_case_dist_unfold' in Hrec_call.
       clear Hcons_case_dist_unfold'.
 
-      rewrite Hrec_call'.
+      rewrite Hrec_call.
       rewrite in_app_iff.
       right.
       rewrite in_app_iff.
@@ -1976,18 +1945,15 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t2'.
 
       (* rewrite call and rec. calls *)
-      assert(exists proof_subt : subterms (ct t1 t2) t1 t2,
-                M_ev g (ct t1 t2, (cp p1 p2, g')) =
-                cons_case (ct t1 t2) t1 t2 proof_subt
-                          (M_ev g (t1, (p1, g)))
-                          (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+      assert(M_ev g (ct t1 t2, (cp p1 p2, g')) =
+               cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
+                 (M_ev g (t1, (p1, g)))
+                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
       {apply (M_ev_rew_cons_case g g' t1 t2 p1 p2).
       }
-      inversion Heq_call as [proof_subt Heq_call'].
+      rewrite Heq_call.
       clear Heq_call.
-      rewrite Heq_call'.
-      clear Heq_call'.
       rewrite Hsplit_t1''.
       clear Hsplit_t1''.
       rewrite Hsplit_t2''.
@@ -1997,7 +1963,7 @@ Module Completeness (pt : PatTermsSymb).
       remember (nonempty_d_ev t2 C0 sub_t' ev_decom)
         as t2_decom.
       rewrite cons_case_dist.
-      remember (cons_case (ct t1 t2) t1 t2 proof_subt
+      remember (cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
                           (mtch_pair t1 (empty_d_ev t1) b1 :: mp2)
                           (mp1'
                              ++
@@ -2009,12 +1975,12 @@ Module Completeness (pt : PatTermsSymb).
                 res
                   ++
                   (cons_case_aux (ct t1 t2) t1 t2
-                                 proof_subt
+                                 (build_subterm_proof t1 t2)
                                  (mtch_pair t1 (empty_d_ev t1) b1)
                                  (mtch_pair t2 t2_decom b2 :: mp2'))
                   ++
                   cons_case (ct t1 t2) t1 t2
-                  proof_subt mp2
+                  (build_subterm_proof t1 t2) mp2
                   (mp1' ++ mtch_pair t2 t2_decom b2 :: mp2'))
         as Hcons_dist.
       {rewrite Heq_lelem.
@@ -2027,7 +1993,7 @@ Module Completeness (pt : PatTermsSymb).
       rewrite Heqt2_decom in Hcons_dist'.
       rewrite H0 in Hcons_dist'.
 
-      exists (subterm1 proof_subt ev_decom (erefl (list_term_c t2))).
+      exists (subterm1 (build_subterm_proof t1 t2) ev_decom (erefl (list_term_c t2))).
       rewrite in_app_iff.
 
       right.
@@ -2156,18 +2122,15 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t2'.
 
       (* rewrite call and rec. calls *)
-      assert(exists proof_subt : subterms (ct t1 t2) t1 t2,
-                M_ev g (ct t1 t2, (cp p1 p2, g')) =
-                cons_case (ct t1 t2) t1 t2 proof_subt
-                          (M_ev g (t1, (p1, g)))
-                          (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+      assert(M_ev g (ct t1 t2, (cp p1 p2, g')) =
+               cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
+                 (M_ev g (t1, (p1, g)))
+                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
       {apply M_ev_rew_cons_case.
       }
-      inversion Heq_call as [proof_subt Heq_call'].
+      rewrite Heq_call.
       clear Heq_call.
-      rewrite Heq_call'.
-      clear Heq_call'.
       rewrite Hsplit_t1''.
       rewrite Hsplit_t2''.
 
@@ -2175,26 +2138,26 @@ Module Completeness (pt : PatTermsSymb).
       remember (nonempty_d_ev t1 C0 sub_t' ev_decom)
         as t1_decom.
       rewrite cons_case_dist.
-      remember (cons_case (ct t1 t2) t1 t2 proof_subt
+      remember (cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
                           (mtch_pair t1 t1_decom b1 :: mp2)
                           (mp1'
                              ++ mtch_pair t2 (empty_d_ev t2) b2 :: mp2'))
         as lelem eqn:Heq_lelem.
 
       assert(exists (res : mtch_powset_ev (ct t1 t2)),
-                cons_case (ct t1 t2) t1 t2 proof_subt
+                cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
                           (mtch_pair t1 t1_decom b1 :: mp2)
                           (mp1'
                              ++ mtch_pair t2 (empty_d_ev t2) b2 :: mp2') =
                 res
                   ++
                   (cons_case_aux (ct t1 t2) t1 t2
-                                 proof_subt
+                                 (build_subterm_proof t1 t2)
                                  (mtch_pair t1 t1_decom b1)
                                  (mtch_pair t2 (empty_d_ev t2) b2 :: mp2'))
                   ++
                   cons_case (ct t1 t2) t1 t2
-                  proof_subt mp2
+                  (build_subterm_proof t1 t2) mp2
                   (mp1' ++ mtch_pair t2 (empty_d_ev t2) b2 :: mp2'))
         as Hcons_dist.
       {apply cons_case_dist_unfold.
@@ -2211,7 +2174,7 @@ Module Completeness (pt : PatTermsSymb).
       rewrite Heqt1_decom in Heq_lelem.
       rewrite <- Heq_lelem in Hcons_dist'.
 
-      exists (subterm2 proof_subt (erefl t1) ev_decom).
+      exists (subterm2 (build_subterm_proof t1 t2) (erefl t1) ev_decom).
       rewrite in_app_iff.
 
       right.
@@ -3036,36 +2999,14 @@ Module Completeness (pt : PatTermsSymb).
 
       (* we show that
             In (mtch_pair t0 (empty_d_ev t0) bp)
-               (M_ev (m_rel_e (g, t0) (p0, g'))*)
-      assert(matching_tuple_inverted (t1, (name x p0, g'))  =
-             (name_pat x p0, g', t1)) as Heqproj.
-      {reflexivity.
-      }
-      rewrite (M_ev_rew_name_case g g' t1 p0 x
-                                  Heqproj).
+               (M_ev (m_rel_e (g, t0) (p0, g')) *)
+      rewrite (M_ev_rew_name_case g g' t1 p0 x).
       simpl.
-      assert(forall (mpair : mtch_ev t1)
-               (mset : mtch_powset_ev (matching_tuple_term (t1, (p0, g')))),
-                In mpair mset ->
-                In mpair (M_ev_sixth_eq_trans2
-                            (t1, (name_pat x p0, g')) g g' t1 p0 x
-                            Heqproj mset)) as Hinmpair.
-      {intros mpair mset Hin.
-       unfold M_ev_sixth_eq_trans2.
-       assert(Heqproj = eq_refl) as H6.
-       {apply UIP_refl.
-       }
-       rewrite H6.
-       simpl.
-       exact Hin.
-      }
 
       assert(exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1)
-                   (M_ev_sixth_eq_trans2
-                      (t1, (name_pat x p0, g')) g g' t1 p0 x
-                      Heqproj
-                      (M_ev g (t1, (p0, g')))))
+                   (M_ev g (t1, (p0, g')))
+            )
         as Hinpair_inst.
       {assert(matching_tuple_order g (t1, (p0, g')) (t1, (name x p0, g')))
           as Hname_pat_rel.
@@ -3097,24 +3038,17 @@ Module Completeness (pt : PatTermsSymb).
        clear Hpair_Mev.
 
        exists ev_decom.
-
-       apply (Hinmpair (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1)
-                       (M_ev g (t1, (p0, g')))
-                       Hpair_Mev').
+       exact Hpair_Mev'.
       }
       (* now we show the effect of name_case over
             (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1) *)
-      remember (M_ev_sixth_eq_trans2
-                  (t1, (name x p0, g')) g g' t1 p0 x
-                  Heqproj
-                  (M_ev g (t1, (p0, g')))) as rec_set.
 
       inversion Hinpair_inst as [ev_decom Hinpair_inst'].
       clear Hinpair_inst.
       exists ev_decom.
 
       assert(exists l1 l2,
-                rec_set = l1 ++
+                M_ev g (t1, (p0, g')) = l1 ++
                              (mtch_pair t1
                                         (nonempty_d_ev t1 C' sub_t'
                                                        ev_decom) b1) :: l2)
