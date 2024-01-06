@@ -153,9 +153,9 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
   (* ********************************* *)
   (* new_gramar *)
   (* ********************************* *)
-  
-  Definition new_grammar (prods : productions) : grammar :=
-    (remove_rep_elem production production_eq_dec prods).
+  (* for this simple implementation we do not need to enforce some property 
+     over the generated grammar, e.g., no duplicated productions *)
+  Definition new_grammar (prods : productions) : grammar := prods.
 
   (* ********************************* *)
   (* grammar_length *)
@@ -293,12 +293,76 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
     end.
 
   Definition remove_prod (p : production) (g : grammar) 
-             (proof : prod_in_g p g) : grammar :=
-    (remove_prod_aux g p). 
+             (proof : prod_in_g p g) : grammar := remove_prod_aux g p. 
+
+  Definition fast_remove_prod (p : production) (g : grammar) : grammar := 
+    remove_prod_aux g p.
 
   Lemma remove_prod_length_decrease : 
     forall (g : grammar) prod (proof : prod_in_g prod g),
      grammar_length (remove_prod prod g proof) < grammar_length g.
+  Proof.
+    intros.
+    induction g.
+    - inversion proof.
+      inversion H.
+    - inversion proof.
+      apply (in_inv_trans production a prod g) in H.
+      inversion H.
+      + unfold remove_prod.
+        simpl.
+        destruct (production_eq_dec prod a).
+        -- apply suc_prop_trans.
+        -- simpl.
+           unfold remove_prod in IHg.
+           assert(In prod g).
+           {assert(a = prod \/ In prod g).
+            {apply in_inv_trans.
+             exact H.
+            }
+            inversion H3.
+            ++ symmetry in H4.
+               contradiction.
+            ++ exact H4.
+           }
+           assert(prod_in_g prod g).
+           {constructor.
+            exact H3.
+           }
+           apply IHg in H4.
+           apply (lt_n_S_trans (grammar_length (remove_prod_aux g prod))
+                               (grammar_length g)
+                               H4).
+      + unfold remove_prod.
+        simpl.
+        destruct (production_eq_dec prod a).
+        -- apply suc_prop_trans.
+        -- simpl.
+           unfold remove_prod in IHg.
+            simpl.
+           assert(In prod g).
+           {assert(a = prod \/ In prod g).
+            {apply in_inv_trans.
+             exact H.
+            }
+            inversion H3.
+            ++ symmetry in H4.
+               contradiction.
+            ++ exact H4.
+           }
+           assert(prod_in_g prod g).
+           {constructor.
+            exact H3.
+           }
+           apply IHg in H4.
+           apply (lt_n_S_trans (grammar_length (remove_prod_aux g prod))
+                               (grammar_length g)
+                               H4).
+  Defined.
+
+  Lemma fast_remove_prod_length_decrease : 
+    forall (g : grammar) prod (proof : prod_in_g prod g),
+     grammar_length (fast_remove_prod prod g) < grammar_length g.
   Proof.
     intros.
     induction g.
@@ -1120,20 +1184,20 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
           (eq_proof : prods = [(n1, p)] ++ prods_suf)
           (proofs_suf : list {p' : pat | In (n2, p') prods_suf}) :
     list {p' : pat | In (n2, p') prods} :=
-    (match proofs_suf as proofs_suf'
-           return proofs_suf = proofs_suf' ->
-                  list {p : pat | In (n2, p) prods} with
-     | nil                       => (fun eq => nil)
-     | (exist _ p' proof) :: tail =>
-       (fun eq => (exist (fun pat => In (n2, pat) prods)
-                      p'
-                      (eq_ind_r (fun prods0 : productions => In (n2, p') prods0)
-                                (in_cons_trans production (n1, p) (n2, p') 
-                                               prods_suf proof) 
-                                eq_proof)) 
-                 :: (get_rhs_prods_aux prods_suf prods 
-                                      n1 n2 p eq_proof tail))
-     end eq_refl).
+    match proofs_suf as proofs_suf'
+          return proofs_suf = proofs_suf' ->
+                 list {p : pat | In (n2, p) prods} with
+    | nil                       => 
+        fun eq => nil
+    | (exist _ p' proof) :: tail =>
+        fun eq => exist (fun pat => In (n2, pat) prods)
+                 p'
+                 (eq_ind_r (fun prods0 : productions => In (n2, p') prods0)
+                    (in_cons_trans production (n1, p) (n2, p') 
+                       prods_suf proof) 
+                    eq_proof)
+                 :: get_rhs_prods_aux prods_suf prods n1 n2 p eq_proof tail
+    end eq_refl.
 
   (* simple distribution property of get_rhs_prods_aux prods_suf over its last 
      argument, to simplify reasoning about some statements over
@@ -1174,44 +1238,44 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
      (n, p) in prods *)
   Fixpoint get_rhs_prods (prods : productions) (n : nonterm) : 
     list {p : pat | In (n, p) prods} :=
-    
-    (match prods as prods' return prods = prods' -> 
-                                  list {p : pat | In (n, p) prods} with
-     | nil            => (fun _ => nil)
+    match prods as prods' return prods = prods' -> 
+                                 list {p : pat | In (n, p) prods} with
+    | nil            => 
+        fun _ => nil
 
-     | (n', p) :: tail =>
+    | (n', p) :: tail =>
 
-       (fun eq : prods = (n', p) :: tail =>
+        fun eq : prods = (n', p) :: tail =>
           
-         match (nonterm_eq_dec n n') as proof return
-         (nonterm_eq_dec n n') = proof -> list {p : pat | In (n, p) prods} with
-         
-         | left eq_proof => 
-           
-           fun eqp : (nonterm_eq_dec n n') = left eq_proof =>
-             (exist (fun pat => In (n, pat) prods)
-                    p 
-                    (eq_ind_r (fun prods0 : productions => In (n, p) prods0)
-                              (* In (n', p) tail *)
-                              (eq_ind_r
-                                 (fun n0 : nonterm => In (n0, p) ((n', p) :: tail))
-                                 (in_eq_trans production (n', p) tail) eq_proof)
-                              eq)) 
-               :: (get_rhs_prods_aux tail prods n n p
-                                    (* prods = [(n, p)] ++ tail *)
-                                    (eq_ind_r 
-                                       (fun n0 : nonterm => 
-                                          prods = [(n0, p)] ++ tail)
-                                       eq eq_proof)
-                                    (get_rhs_prods tail n))
-         | right _ => 
-           
-           fun eqp : _ =>
-           (get_rhs_prods_aux tail prods n' n p
-                                            eq
-                                            (get_rhs_prods tail n))
-         end eq_refl)
-     end eq_refl).
+          match nonterm_eq_dec n n' as proof return
+                nonterm_eq_dec n n' = proof -> list {p : pat | In (n, p) prods} with
+            
+          | left eq_proof => 
+              
+              fun eqp : (nonterm_eq_dec n n') = left eq_proof =>
+                exist (fun pat => In (n, pat) prods)
+                  p 
+                  (eq_ind_r (fun prods0 : productions => In (n, p) prods0)
+                     (* In (n', p) tail *)
+                     (eq_ind_r
+                        (fun n0 : nonterm => In (n0, p) ((n', p) :: tail))
+                        (in_eq_trans production (n', p) tail) eq_proof)
+                     eq)
+                  :: get_rhs_prods_aux tail prods n n p
+                  (* prods = [(n, p)] ++ tail *)
+                  (eq_ind_r 
+                     (fun n0 : nonterm => 
+                        prods = [(n0, p)] ++ tail)
+                     eq eq_proof)
+                  (get_rhs_prods tail n)
+          | right _ => 
+              
+              fun eqp : _ =>
+                get_rhs_prods_aux tail prods n' n p
+                  eq
+                  (get_rhs_prods tail n)
+          end eq_refl
+    end eq_refl.
 
   (* transforms proofs of In (n, p) g into proofs of prod_in_g (n, p) g *)
   Fixpoint get_rhs_aux (g : grammar) (n : nonterm)
@@ -1249,8 +1313,17 @@ Module GrammarLists(pt : PatTermsSymb) <: Grammar pt.
   (* to obtain the right-hand side of every production from a given 
      non-terminal *)
   Definition get_rhs (g : grammar) (n : nonterm) : 
-    list {p : pat | prod_in_g (n, p) g} :=
-    (get_rhs_aux g n (get_rhs_prods g n)).
+    list {p : pat | prod_in_g (n, p) g} := get_rhs_aux g n (get_rhs_prods g n).
+
+  Fixpoint fast_get_rhs (g : grammar) (n : nonterm) : list pat :=
+    match g with
+    | nil => nil
+    | (n', p) :: tail =>
+          match nonterm_eq_dec n n' with
+          | left _  => p :: fast_get_rhs tail n
+          | right _ => fast_get_rhs tail n
+          end
+    end.
 
   Lemma get_rhs_prods_split : forall (prods : productions) (n : nonterm) (p : pat)
                                 (_ : In (n, p) prods),

@@ -16,5 +16,7 @@ verification/match_spec_lemmas.v
 verification/match_spec_equiv.v
 verification/completeness.v
 verification/soundness.v
-examples/cbn.v
-examples/cbn_tests.v
+examples/cbv/cbv_grammar.v
+examples/cbv/cbv_meta_functions.v
+examples/cbv/cbv_sem.v
+examples/cbv/cbv_tests.v

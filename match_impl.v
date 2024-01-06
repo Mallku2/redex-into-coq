@@ -1272,15 +1272,15 @@ Module Matching(pt : PatTermsSymb).
 
     Definition M_ev (g : grammar) (tup : matching_tuple) :  
       mtch_powset_ev (matching_tuple_term tup) :=
-      (Fix
-         (matching_tuple_order_well_founded g)
-         (* dependent range type of the function that we are building *)
-         (fun tup : matching_tuple =>
-            mtch_powset_ev (matching_tuple_term tup))
-         (* the function body *)
-         (M_ev_body g)
-         
-         tup).
+      Fix
+        (matching_tuple_order_well_founded g)
+        (* dependent range type of the function that we are building *)
+        (fun tup : matching_tuple =>
+           mtch_powset_ev (matching_tuple_term tup))
+        (* the function body *)
+        (M_ev_body g)
+        
+        tup.
 
     Definition matches (g : grammar) (p: pat) (t: term) :
       list bindings :=
