@@ -18,7 +18,7 @@ Module Reduction (pt : PatTermsSymb).
   Import GrammarLists.
 
   (* language of templates of right-hand side of the reduction rules *)
-  Inductive temp : Type :=
+  Inductive temp : Set :=
   | lit_temp : lit -> temp
   | hole_temp : temp
   | var_temp : var -> temp
@@ -196,7 +196,7 @@ Module Reduction (pt : PatTermsSymb).
       | _,_              => None
       end
     | app_temp f r'    =>
-      match (inst r' b) with
+      match inst r' b with
       | Some t => Some (f t)
       | None   => None
       end

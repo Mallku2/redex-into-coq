@@ -24,7 +24,7 @@ Import CallByValueTermsDec.
 
 (* free-variables from a given lambda-term
    note that we just pay attention to the kind of terms produced
-   by cbv_grammar, and do not consider contexts, since they do not appear
+   by cbv_grammar and do not consider contexts, since they do not appear
    as terms *)
 Fixpoint fv (t : term) : list cnlit :=
   match t with
@@ -192,7 +192,7 @@ Definition substitute_var (t_orig : term) (v v_subt : cnlit) :
 Defined.
 
 (* general capture-avoiding substitution meta-function  *)
-Definition substitute (t : term) (v : cnlit) (t' : term) : term.
+Definition substitute_aux (t : term) (v : cnlit) (t' : term) : term.
   refine
     (Fix
        (Wf_nat.well_founded_ltof _ (fun tvt : term * cnlit * term =>
@@ -269,3 +269,17 @@ Definition substitute (t : term) (v : cnlit) (t' : term) : term.
           simpl;
           lia].
 Defined.
+
+(* for the present version, we need to implement some protocol to codify 
+   every parameter expected by a given meta-function within a single term, 
+   to be able to use this meta-functions with the templates language
+
+   in order to get total functions, we also need to consider the case where
+   the parameters received are not in the domain of the intended function *)
+Definition substitute (params : term) : term :=
+  match params with
+  | list_term_c (cons_term_c t 
+                   (cons_term_c (lit_term l) 
+                      (cons_term_c t' nil_term_c))) => substitute_aux t l t'
+  | _                                               => list_term_c nil_term_c
+  end.

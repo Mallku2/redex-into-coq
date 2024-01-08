@@ -288,7 +288,49 @@ Module MatchImplLemmas (pt : PatTermsSymb).
          functions  *)
        apply fix_eq_fun_ext.
   Qed.
-  
+
+  Lemma M_ev_rew_hole_term_hole_case : 
+    forall (g1 g2 : grammar),
+       (M_ev g1 (contxt_term hole_contxt_c, (hole_pat, g2))
+        =
+        (mtch_pair (contxt_term hole_contxt_c)
+                   (* returned value: ((hole, t), ∅) *)
+                   (nonempty_d_ev (contxt_term hole_contxt_c) hole_contxt_c 
+                      (contxt_term hole_contxt_c) 
+                      (left (conj (erefl (contxt_term hole_contxt_c)) (erefl hole__t))))
+                   nil)
+          :: mtch_pair (contxt_term hole_contxt_c) (empty_d_ev (contxt_term hole_contxt_c)) nil
+          :: nil).
+    Proof.
+      intros g1 g2.
+      M_ev_reduce.
+      reflexivity.
+    Qed.
+
+    Lemma M_ev_rew_hole_term_nhole_case : 
+    forall (g1 g2 : grammar) (t : term),
+      (t <> contxt_term hole_contxt_c ->
+       (M_ev g1 (t, (hole_pat, g2))
+        =
+        (cons (mtch_pair t
+                         (* returned value: ((hole, t), ∅) *)
+                         (nonempty_d_ev t hole_contxt_c t 
+                            (left (conj (erefl t) 
+                                     (erefl hole__t))))
+                         nil)
+              nil))).
+  Proof.
+    intros g1 g2 t H.
+    M_ev_reduce.
+    destruct t;
+      solve [reflexivity
+            | match goal with
+              | [c : contxt |- _] => destruct c
+              end;
+              [tauto | reflexivity]
+              ].
+  Qed.
+
   (*******************)
   (* name pat *)
   (*******************)
@@ -316,7 +358,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       ++ (* b == None *)
          rewrite IH.
          reflexivity.
-  Defined.
+  Qed.
 
   Lemma M_ev_rew_name_case : 
     forall (g1 g2 : grammar) (t : term) (p : pat) (x : var),
@@ -3200,5 +3242,17 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                            auto.
   Qed.
 
+
+  (* experimental evaluator using the previous lemmas as a general 
+     memoization technique *)
+  Ltac M_ev_reduce_memo :=
+    repeat (rewrite M_ev_rew_inhole_case);
+    repeat (rewrite M_ev_rew_hole_term_hole_case);
+    repeat (rewrite M_ev_rew_hole_term_nhole_case);
+    repeat (rewrite M_ev_rew_name_case);
+    repeat (rewrite M_ev_rew_nt_case);
+    repeat (rewrite M_ev_rew_cons_case);
+    repeat (rewrite M_ev_rew_nil_case);
+    repeat (rewrite M_ev_rew_lit_case).
 
 End MatchImplLemmas.

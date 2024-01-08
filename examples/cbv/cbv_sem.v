@@ -42,9 +42,11 @@ Import GrammarLists.
    standard reduction into one relation *)
 Definition cbv_rel := 
   ((* beta-contraction *)
-    (((nt E) __ "E") [ (| ((| (lp lamb) (| ((nt x)__"x") ((nt e)__"e") |) |))
-                           ((nt v)__"v") |) ],
+    (((nt E) __ "E") [ (| ((| (lp lamb) (| ((nt x)__"x") ((nt e)__"e1") |) |))
+                           ((nt e)__"e2") |) ],
       inhole_temp 
         (var_temp "E1") 
-        (app_temp substitute (var_temp "e")) (var_temp "x") (var_temp "v"))))
-    ) :: nil.
+        (app_temp substitute 
+           (cons_temp (var_temp "e1") 
+              (cons_temp (var_temp "x") 
+                 (var_temp "e2")))))) :: nil.
