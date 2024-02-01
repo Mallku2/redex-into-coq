@@ -820,7 +820,7 @@ Module Matching(pt : PatTermsSymb).
        function M (fig. 10) *)
     (* ************************************************************ *)
     (* first equation of M *)
-    Lemma M_ev_first_eq : 
+    Lemma Mev_first_eq : 
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
         (eqp : matching_tuple_inverted tpg1 = ((hole_pat, g2), hole)),
@@ -852,7 +852,7 @@ Module Matching(pt : PatTermsSymb).
       Defined.
 
     (* second equation *)
-    Lemma M_ev_second_eq : 
+    Lemma Mev_second_eq : 
       forall (tpg1 : matching_tuple) 
         (g1 g2 : grammar) 
         (t : term) 
@@ -874,7 +874,7 @@ Module Matching(pt : PatTermsSymb).
     Defined.
 
     (* third equation *)
-    Lemma M_ev_third_eq : 
+    Lemma Mev_third_eq : 
       forall (tpg1 : matching_tuple) 
         (g1 g2 : grammar) 
         (li1 li2 : lit) 
@@ -905,10 +905,10 @@ Module Matching(pt : PatTermsSymb).
       eauto.
     Defined.
       
-    Lemma M_ev_fourth_eq : 
+    Lemma Mev_fourth_eq : 
       forall (g1 g2 : grammar)
         (tpg1 : matching_tuple)
-        (M_ev2 : 
+        (Mev2 : 
           forall tpg2 : matching_tuple,
             matching_tuple_order g1 tpg2 tpg1 ->
             mtch_powset_ev (matching_tuple_term tpg2))
@@ -933,9 +933,9 @@ Module Matching(pt : PatTermsSymb).
 
       rewrite Heq.
       simpl.
-      rewrite Heq in M_ev2.
+      rewrite Heq in Mev2.
       assert(mtch_tl : mtch_powset_ev tl).
-      {apply (M_ev2 (tl, (pl, g1)) Hrel_l).
+      {apply (Mev2 (tl, (pl, g1)) Hrel_l).
       }
       
       (* recursive call over right pattern *)
@@ -946,7 +946,7 @@ Module Matching(pt : PatTermsSymb).
       }
 
       assert(mtch_tr : mtch_powset_ev tr).
-      {apply (M_ev2 (list_term_c tr, (list_pat_c pr, g1)) Hrel_r).
+      {apply (Mev2 (list_term_c tr, (list_pat_c pr, g1)) Hrel_r).
       }
       
       assert(Hsub: subterms (ct tl tr) tl tr).
@@ -958,10 +958,10 @@ Module Matching(pt : PatTermsSymb).
     Defined.
 
     (* fourth equation, left context case *)
-    Lemma M_ev_fourth_eq_l_context : 
+    Lemma Mev_fourth_eq_l_context : 
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
-        (M_ev2 : forall tpg2 : matching_tuple,
+        (Mev2 : forall tpg2 : matching_tuple,
             matching_tuple_order g1 tpg2 tpg1 ->
             mtch_powset_ev (matching_tuple_term tpg2))
         (pl : pat) (pr : list_pat) (C : contxt) (tr : list_term)
@@ -969,11 +969,11 @@ Module Matching(pt : PatTermsSymb).
                 ((cp pl pr, g2), contxt_term (hd_c C tr))),
         mtch_powset_ev (matching_tuple_term tpg1).
     Proof.
-      intros tpg1 g1 g2 M_ev2  pl pr C tr eqp1.
+      intros tpg1 g1 g2 Mev2  pl pr C tr eqp1.
       unfold matching_tuple_inverted in eqp1.
       inversion eqp1 as [ [Heq_snd Heq_fst ] ].
       reconstruct_tuple tpg1 eqp1 Heq_tup1.
-      rewrite Heq_tup1 in M_ev2.
+      rewrite Heq_tup1 in Mev2.
       
 
       (* evidence that we are following the wf rel *)
@@ -985,7 +985,7 @@ Module Matching(pt : PatTermsSymb).
       
       (* recursive call over left pattern *)
       assert(mpset_C : mtch_powset_ev (ctxt C)).
-      {apply (M_ev2 (ctxt C, (pl, g1)) Hrel_l).
+      {apply (Mev2 (ctxt C, (pl, g1)) Hrel_l).
       }
 
       (* evidence that we are following the wf rel *)
@@ -997,7 +997,7 @@ Module Matching(pt : PatTermsSymb).
 
       (* recursive call over right pattern *)
       assert(mpset_tr : mtch_powset_ev tr).
-      {apply (M_ev2 (list_term_c tr, (list_pat_c pr, g1)) Hrel_r).
+      {apply (Mev2 (list_term_c tr, (list_pat_c pr, g1)) Hrel_r).
       }
       
       assert(Hsub: subterms (ctxt hd_c C tr) (ctxt C) (list_term_c tr)).
@@ -1015,10 +1015,10 @@ Module Matching(pt : PatTermsSymb).
     Defined.
 
         (* fourth equation, right context case *)
-    Lemma M_ev_fourth_eq_r_context : 
+    Lemma Mev_fourth_eq_r_context : 
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
-        (M_ev2 : forall tpg2 : matching_tuple,
+        (Mev2 : forall tpg2 : matching_tuple,
             matching_tuple_order g1 tpg2 tpg1 ->
             mtch_powset_ev (matching_tuple_term tpg2))
         (pl : pat) (pr : list_pat) (tl : term) (C : list_contxt)
@@ -1026,11 +1026,11 @@ Module Matching(pt : PatTermsSymb).
                 ((cp pl pr, g2), contxt_term (tail_c tl C))),
         mtch_powset_ev (matching_tuple_term tpg1).
     Proof.
-      intros tpg1 g1 g2 M_ev2 pl pr tl C eqp1.
+      intros tpg1 g1 g2 Mev2 pl pr tl C eqp1.
       unfold matching_tuple_inverted in eqp1.
       inversion eqp1 as [ [Heq_snd Heq_fst ] ].
       reconstruct_tuple tpg1 eqp1 Heq_tup1.
-      rewrite Heq_tup1 in M_ev2.
+      rewrite Heq_tup1 in Mev2.
       
 
       (* evidence that we are following the wf rel *)
@@ -1042,7 +1042,7 @@ Module Matching(pt : PatTermsSymb).
       
       (* recursive call over left pattern *)
       assert(mpset_tl : mtch_powset_ev tl).
-      {apply (M_ev2 (tl, (pl, g1)) Hrel_l).
+      {apply (Mev2 (tl, (pl, g1)) Hrel_l).
       }
 
       (* evidence that we are following the wf rel *)
@@ -1054,7 +1054,7 @@ Module Matching(pt : PatTermsSymb).
 
       (* recursive call over right pattern *)
       assert(mpset_C : mtch_powset_ev (contxt_term (list_contxt_c C))).
-      {apply (M_ev2 (contxt_term (list_contxt_c C), (list_pat_c pr, g1)) Hrel_r).
+      {apply (Mev2 (contxt_term (list_contxt_c C), (list_pat_c pr, g1)) Hrel_r).
       }
       
       assert(Hsub: subterms (ctxt tail_c tl C) tl (ctxt C)).
@@ -1070,27 +1070,27 @@ Module Matching(pt : PatTermsSymb).
     Defined.
 
     (* fifth equation *)
-    Lemma M_ev_fifth_eq :
+    Lemma Mev_fifth_eq :
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
-        (M_ev2 : forall tpg2 : matching_tuple,
+        (Mev2 : forall tpg2 : matching_tuple,
             matching_tuple_order g1 tpg2 tpg1 ->
             mtch_powset_ev (matching_tuple_term tpg2))
         (t : term) (pc ph : pat)
         (eqp : matching_tuple_inverted tpg1 = ((inhole_pat pc ph, g2), t)),
         mtch_powset_ev (matching_tuple_term tpg1).
     Proof.
-      intros tpg1 g1 g2 M_ev2 t pc ph eqp.
+      intros tpg1 g1 g2 Mev2 t pc ph eqp.
       unfold matching_tuple_inverted in eqp.
       inversion eqp as [ [Heq_snd Heq_fst ] ].
       reconstruct_tuple tpg1 eqp Heq_tup1.
-      rewrite Heq_tup1 in M_ev2.
+      rewrite Heq_tup1 in Mev2.
       rewrite Heq_fst.
-      apply (inhole_case t pc ph g1 g2 M_ev2).
+      apply (inhole_case t pc ph g1 g2 Mev2).
     Defined.
 
     (* sixth equation *)
-    Lemma M_ev_sixth_eq_rel : 
+    Lemma Mev_sixth_eq_rel : 
       forall (tpg : matching_tuple)
         (g1 g2 : grammar) (t : term) (x : var)
         (p : pat) 
@@ -1106,7 +1106,7 @@ Module Matching(pt : PatTermsSymb).
       matching_tuple_order_build_ev.
     Defined.
 
-    Lemma M_ev_sixth_eq_trans2 : 
+    Lemma Mev_sixth_eq_trans2 : 
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar) (t : term) (p : pat) (x : var)
         (eqp : matching_tuple_inverted tpg1 = ((name_pat x p, g2), t))
@@ -1119,7 +1119,7 @@ Module Matching(pt : PatTermsSymb).
       exact mtch_set.
     Defined.
 
-    Lemma M_ev_sixth_eq_trans : 
+    Lemma Mev_sixth_eq_trans : 
       forall (tpg1 : matching_tuple) (t : term) (p : pat) (x : var) (g1 g2 : grammar)
         (eqp : matching_tuple_inverted tpg1 = ((name_pat x p, g2), t))
         (ev : pat_grammar_evolution (p, g2) (name_pat x p, g2)),
@@ -1132,10 +1132,10 @@ Module Matching(pt : PatTermsSymb).
     Defined.
     
     (* seventh equation *)
-    Lemma M_ev_seventh_eq_trans :
+    Lemma Mev_seventh_eq_trans :
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
-        (M_ev2 : forall tpg2 : matching_tuple,
+        (Mev2 : forall tpg2 : matching_tuple,
             matching_tuple_order g1 tpg2 tpg1 -> 
             mtch_powset_ev (matching_tuple_term tpg2))
         (t : term) (n : nonterm)
@@ -1144,13 +1144,13 @@ Module Matching(pt : PatTermsSymb).
             matching_tuple_order g1 tpg2 (t, (nt_pat n, g2)) ->
             mtch_powset_ev (matching_tuple_term tpg2)).
     Proof.
-      intros tpg1 g1 g2 M_ev2 t n eqp.
+      intros tpg1 g1 g2 Mev2 t n eqp.
       reconstruct_tuple tpg1 eqp Heq_tup1.
       inversion eqp as [ [Heq_snd Heq_fst ] ].
-      rewrite Heq_tup1 in M_ev2.
+      rewrite Heq_tup1 in Mev2.
       rewrite Heq_fst.
       rewrite Heq_snd.
-      exact M_ev2.
+      exact Mev2.
     Defined.
 
     Lemma eq_proof : 
@@ -1163,7 +1163,7 @@ Module Matching(pt : PatTermsSymb).
       reflexivity.
     Defined.
 
-    Lemma M_ev_eighth_eq : 
+    Lemma Mev_eighth_eq : 
       forall (tpg1 : matching_tuple)
         (g1 g2 : grammar)
         (eqp : matching_tuple_inverted tpg1 = 
@@ -1183,10 +1183,10 @@ Module Matching(pt : PatTermsSymb).
                nil).
       Defined.
 
-    Definition M_ev_body :=
+    Definition Mev_gen :=
       (fun (g1 : grammar)
          (tpg1 : matching_tuple)
-         (M_ev2 : forall tpg2 : matching_tuple,
+         (Mev2 : forall tpg2 : matching_tuple,
              matching_tuple_order g1 tpg2 tpg1 ->
              mtch_powset_ev (matching_tuple_term tpg2)) =>
          match (matching_tuple_inverted tpg1) as tpg1'
@@ -1203,50 +1203,50 @@ Module Matching(pt : PatTermsSymb).
                (* TODO: cannot convince type checker by mean of match  *)
                (* annotations; forced to introduce the return exp. in  *)
                (* proof mode *)
-               M_ev_first_eq tpg1 g1 g2 eqp
+               Mev_first_eq tpg1 g1 g2 eqp
                  
          (* the hole decomposition rule decomposes any term t  *)
          (* into the empty context and t itself. *)
          | ((hole_pat, g2), t) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((hole_pat, g2), t) =>
-               M_ev_second_eq tpg1 g1 g2 t eqp
+               Mev_second_eq tpg1 g1 g2 t eqp
                  
          (* TODO: pattern that forces 2 occurrences of the same  *)
          (*    literal li? *)
          | ((lit_pat li1, g2), lit_term li2) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((lit_pat li1, g2), lit_term li2) =>
-               M_ev_third_eq tpg1 g1 g2 li1 li2 eqp
+               Mev_third_eq tpg1 g1 g2 li1 li2 eqp
                  
          | ((cp pl pr, g2), ct tl tr) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((cp pl pr, g2), ct tl tr) =>
-               M_ev_fourth_eq g1 g2 tpg1 M_ev2 pl pr tl tr eqp
+               Mev_fourth_eq g1 g2 tpg1 Mev2 pl pr tl tr eqp
                  
          | ((cp pl pr, g2), ctxt (hd_c C tr)) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((cp pl pr, g2), ctxt (hd_c C tr)) =>
-               M_ev_fourth_eq_l_context tpg1 g1 g2 M_ev2 pl pr C tr eqp
+               Mev_fourth_eq_l_context tpg1 g1 g2 Mev2 pl pr C tr eqp
 
          | ((cp pl pr, g2), ctxt (tail_c tl C)) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((cp pl pr, g2), ctxt (tail_c tl C)) =>
-               M_ev_fourth_eq_r_context tpg1 g1 g2 M_ev2 pl pr tl C eqp
+               Mev_fourth_eq_r_context tpg1 g1 g2 Mev2 pl pr tl C eqp
                  
          | ((inhole_pat pc ph, g2), t) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((inhole_pat pc ph, g2), t) =>
-               M_ev_fifth_eq tpg1 g1 g2 M_ev2 t pc ph eqp
+               Mev_fifth_eq tpg1 g1 g2 Mev2 t pc ph eqp
                  
          | ((name_pat x p, g2), t) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((name_pat x p, g2), t) =>
                name_case (matching_tuple_term tpg1)
-                  (M_ev_sixth_eq_trans2
+                  (Mev_sixth_eq_trans2
                      tpg1 g1 g2 t p x eqp
-                     (M_ev2 (t, (p, g2))
-                        (M_ev_sixth_eq_rel tpg1 g1 g2 t x
+                     (Mev2 (t, (p, g2))
+                        (Mev_sixth_eq_rel tpg1 g1 g2 t x
                            p eqp)))
                   x
                  
@@ -1257,8 +1257,8 @@ Module Matching(pt : PatTermsSymb).
                eq_rect t
                   (fun (t : term) => mtch_powset_ev t) 
                   (nt_case g1 g2 n t
-                     (M_ev_seventh_eq_trans tpg1 g1 g2
-                        M_ev2 
+                     (Mev_seventh_eq_trans tpg1 g1 g2
+                        Mev2 
                         t n eqp))
                   (matching_tuple_term tpg1)
                   (eq_proof (nt_pat n) g2 t tpg1 eqp)
@@ -1266,19 +1266,19 @@ Module Matching(pt : PatTermsSymb).
          | ((list_pat_c nil_pat_c, g2), list_term_c nil_term_c) =>
              fun eqp : matching_tuple_inverted tpg1 =
                        ((list_pat_c nil_pat_c, g2), list_term_c nil_term_c) =>
-               M_ev_eighth_eq tpg1 g1 g2 eqp
+               Mev_eighth_eq tpg1 g1 g2 eqp
          | _ => fun _ => nil
          end eq_refl).
 
-    Definition M_ev (g : grammar) (tup : matching_tuple) :  
+    Definition Mev (g : grammar) (tup : matching_tuple) :  
       mtch_powset_ev (matching_tuple_term tup) :=
-      Fix
+      (Fix
         (matching_tuple_order_well_founded g)
         (* dependent range type of the function that we are building *)
         (fun tup : matching_tuple =>
            mtch_powset_ev (matching_tuple_term tup))
-        (* the function body *)
-        (M_ev_body g)
+        (* generator function *)
+        (Mev_gen g))
         
         tup.
 
@@ -1288,7 +1288,7 @@ Module Matching(pt : PatTermsSymb).
                   | mtch_pair _ _ b => b
                   end)
            
-           (M_ev g (t, (p, g)))).
+           (Mev g (t, (p, g)))).
     
     Fixpoint clean_ev (t: term) (mtch_s : mtch_powset_ev t) :
       mtch_powset :=
@@ -1299,7 +1299,7 @@ Module Matching(pt : PatTermsSymb).
       end.
 
     Definition M (g : grammar) (p : pat) (t : term) : mtch_powset :=
-      (clean_ev t (M_ev g (t, (p, g)))).
+      clean_ev t (Mev g (t, (p, g))).
 
   End MatchDecom.
 

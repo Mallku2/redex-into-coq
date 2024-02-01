@@ -13,7 +13,7 @@ Require Export
         match_spec_lemmas
         lib_ext.ListExt.
 
-(* completeness of M_ev *)
+(* completeness of Mev *)
 Module Completeness (pt : PatTermsSymb).
   Import pt.
 
@@ -48,23 +48,23 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
         In (mtch_pair t0 (empty_d_ev t0) b0)
-           (M_ev g (t0, (name x p0, g'))).
+           (Mev g (t0, (name x p0, g'))).
     Proof.
       intros p0 sub_t sub_t' C t0 bp b0 g g' x Hmatch H1 H.
       (* we show that
             In (mtch_pair t0 (empty_d_ev t0) bp)
-               (M_ev (m_rel_e (g, t0) (p0, g'))*)
-      rewrite (M_ev_rew_name_case g g' t0 p0 x).
+               (Mev (m_rel_e (g, t0) (p0, g'))*)
+      rewrite (Mev_rew_name_case g g' t0 p0 x).
 
       assert(In (mtch_pair t0 (empty_d_ev t0) bp)
-                   (M_ev g (t0, (p0, g'))))
+                   (Mev g (t0, (p0, g'))))
         as Hinpair_inst.
       {assert(matching_tuple_order g
                 (t0, (p0, g'))
@@ -75,12 +75,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t0 p0 g' bp ->
                In (mtch_pair t0 (empty_d_ev t0) bp)
-                  (M_ev g (t0, (p0, g')))) /\
+                  (Mev g (t0, (p0, g')))) /\
               (decompose_spec g t0  C sub_t p0 g' bp ->
                exists ev_decom : {sub_t = t0 /\ C = hole_contxt_c} + {subterm_rel sub_t t0},
                  In
                    (mtch_pair t0 (nonempty_d_ev t0 C sub_t ev_decom) bp)
-                   (M_ev g (t0, (p0, g')))))
+                   (Mev g (t0, (p0, g')))))
          as Happ.
        {apply (H (t0, (p0, g'))
                  Hname_pat_rel
@@ -93,7 +93,7 @@ Module Completeness (pt : PatTermsSymb).
       (* now we show the effect of name_case over
             (mtch_pair t0 (empty_d_ev t0) bp) *)
 
-      assert(exists l1 l2, M_ev g (t0, (p0, g')) = l1 ++ (mtch_pair t0 (empty_d_ev t0) bp) :: l2)
+      assert(exists l1 l2, Mev g (t0, (p0, g')) = l1 ++ (mtch_pair t0 (empty_d_ev t0) bp) :: l2)
         as Hrec_set_split.
       {apply in_split.
        
@@ -164,16 +164,16 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end)
         (proof : prod_in_g (n, p0) g')
         (Hmatch : match_spec g t0 p0 (remove_prod (n, p0) g' proof) b0),
         In (mtch_pair t0 (empty_d_ev t0) ∅)
-           (M_ev g (t0, (nt n, g'))).
+           (Mev g (t0, (nt n, g'))).
     Proof.
       intros p0 t0 sub_t sub_t' b0 C C' g g' n H proof Hmatch.
 
@@ -186,16 +186,16 @@ Module Completeness (pt : PatTermsSymb).
       }
 
       assert(In (mtch_pair t0 (empty_d_ev t0) b0)
-                (M_ev g (t0, (p0, remove_prod (n, p0) g' proof))))
+                (Mev g (t0, (p0, remove_prod (n, p0) g' proof))))
         as IH.
       {assert((match_spec g t0 p0 (remove_prod (n, p0) g' proof) b0 ->
                In (mtch_pair t0 (empty_d_ev t0) b0)
-                  (M_ev g (t0, (p0, (remove_prod (n, p0) g' proof))))) /\
+                  (Mev g (t0, (p0, (remove_prod (n, p0) g' proof))))) /\
               (decompose_spec g t0 C sub_t p0 (remove_prod (n, p0) g' proof) b0 ->
                exists ev_decom : {sub_t = t0 /\ C = hole_contxt_c} + {subterm_rel sub_t t0},
                  In
                    (mtch_pair t0 (nonempty_d_ev t0 C sub_t ev_decom) b0)
-                   (M_ev g (t0, (p0, (remove_prod (n, p0) g' proof))))))
+                   (Mev g (t0, (p0, (remove_prod (n, p0) g' proof))))))
           as Happ.
        {apply (H (t0, (p0, remove_prod (n, p0) g' proof))
                  Hnt_rel
@@ -206,8 +206,8 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch_spec Hmatch).
       }
 
-      (* rewrite call to M_ev nt n *)
-      rewrite (M_ev_rew_nt_case g g' t0 n).
+      (* rewrite call to Mev nt n *)
+      rewrite (Mev_rew_nt_case g g' t0 n).
       unfold nt_case.
       assert(exists (proof' : prod_in_g (n, p0) g') G1' G1'',
                 get_rhs g' n = G1' ++ ((exist (fun pa =>
@@ -232,7 +232,7 @@ Module Completeness (pt : PatTermsSymb).
       rewrite in_app_iff.
       left.
 
-      assert(exists l1 l2, M_ev g (t0, (p0, remove_prod (n, p0) g' proof'))
+      assert(exists l1 l2, Mev g (t0, (p0, remove_prod (n, p0) g' proof'))
                       =
                       l1 ++ (mtch_pair t0 (empty_d_ev t0) b0) :: l2)
         as Hin.
@@ -269,34 +269,34 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end)
         (Hmatch1 : match_spec g t1 p1 g b1)
         (Hmatch2 : match_spec g t2 p2 g b2)
         (H2 : b_union b1 b2 = Some b0),
         In (mtch_pair (ct t1 t2) (empty_d_ev (ct t1 t2)) b0)
-           (M_ev g (ct t1 t2, (cp p1 p2, g'))).
+           (Mev g (ct t1 t2, (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t sub_t' b1 b2 b0 C C' g g' t1 t2 H
              Hmatch1 Hmatch2 H2.
 
-      (* express M_ev in terms of function cons_case *)
-      assert(M_ev g (ct t1 t2, (cp p1 p2, g'))
+      (* express Mev in terms of function cons_case *)
+      assert(Mev g (ct t1 t2, (cp p1 p2, g'))
              =
                cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
-                 (M_ev g (t1, (p1, g)))
-                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                 (Mev g (t1, (p1, g)))
+                 (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hrec_call.
-      {apply M_ev_rew_cons_case.
+      {apply Mev_rew_cons_case.
       }
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair t1 (empty_d_ev t1) b1)
-                (M_ev g (t1, (p1, g))))
+                (Mev g (t1, (p1, g))))
         as Hin_t1.
       {assert(matching_tuple_order g
                 (t1, (p1, g))
@@ -307,12 +307,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1 C sub_t p1 g b1 ->
                exists ev_decom : {sub_t = t1 /\ C = hole_contxt_c} + {subterm_rel sub_t t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 C sub_t ev_decom) b1)
-                   (M_ev g (t1, (p1, g)))))
+                   (Mev g (t1, (p1, g)))))
          as Happ.
        {
         apply (H (t1, (p1, g))
@@ -324,7 +324,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch_spec Hmatch1).
       }
       assert(exists l1_t1 l2_t1,
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 l1_t1 ++ (mtch_pair t1 (empty_d_ev t1) b1) :: l2_t1)
         as Hsplit_t1.
       {apply (in_split _ _ Hin_t1).
@@ -336,7 +336,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hin_t1.
 
       assert(In (mtch_pair t2 (empty_d_ev t2) b2)
-                (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hin_t2.
       {assert(matching_tuple_order g
                 (list_term_c t2, (list_pat_c p2, g))
@@ -347,12 +347,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2 C sub_t p2 g b2 ->
                exists ev_decom : {sub_t = t2 /\ C = hole_contxt_c} + {subterm_rel sub_t t2},
                  In
                    (mtch_pair t2 (nonempty_d_ev t2 C sub_t ev_decom) b2)
-                   (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                   (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Happ.
        {apply (H (list_term_c t2, (list_pat_c p2, g))
                  Hmrel_t2
@@ -365,7 +365,7 @@ Module Completeness (pt : PatTermsSymb).
       }
 
       assert(exists l1_t2 l2_t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 l1_t2 ++ (mtch_pair t2 (empty_d_ev t2) b2) :: l2_t2)
         as Hsplit_t2.
       {apply (in_split _ _ Hin_t2).
@@ -435,39 +435,39 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                 (M_ev g (t', (p', G2')))) /\
+                 (Mev g (t', (p', G2')))) /\
                 (decompose_spec g t' C' sub_t' p' G2' b' ->
                  exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                    In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                     (M_ev g (t', (p', G2'))))
+                     (Mev g (t', (p', G2'))))
             end)
         (Hmatch1 : match_spec g (ctxt C0) p1 g b1)
         (Hmatch2 : match_spec g t2 p2 g b2)
         (H2 : b_union b1 b2 = Some b0),
         In (mtch_pair (ctxt (hd_contxt C0 t2)) (empty_d_ev (ctxt (hd_contxt C0 t2))) b0)
-          (M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
+          (Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t sub_t' t2 b0 b1 b2 C C0 C' g g' H
         Hmatch1 Hmatch2 H2.
 
-      (* express M_ev in terms of function cons_case *)
+      (* express Mev in terms of function cons_case *)
       assert(exists (proof_subt : subterms (ctxt (hd_contxt C0 t2))
                                            (ctxt C0)
                                            t2),
-                M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))
+                Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))
                 =
                 (cons_case (ctxt (hd_contxt C0 t2)) (ctxt C0) t2 proof_subt
-                           (M_ev g (ctxt C0, (p1, g)))
-                           (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                           (Mev g (ctxt C0, (p1, g)))
+                           (Mev g (list_term_c t2, (list_pat_c p2, g)))))
         as Hrec_call.
-      {apply M_ev_rew_cons_case_hd_ctxt.
+      {apply Mev_rew_cons_case_hd_ctxt.
       }
       inversion Hrec_call as [proof_subt Hrec_call'].
       clear Hrec_call.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1)
-                (M_ev g (ctxt C0, (p1, g))))
+                (Mev g (ctxt C0, (p1, g))))
         as Hin_ctxt_C0.
       {assert(matching_tuple_order g
                 (ctxt C0, (p1, g))
@@ -478,12 +478,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g (ctxt C0) p1 g b1 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1)
-                  (M_ev g (ctxt C0, (p1, g)))) /\
+                  (Mev g (ctxt C0, (p1, g)))) /\
               (decompose_spec g (ctxt C0) C sub_t p1 g b1 ->
                exists ev_decom : {sub_t = (ctxt C0) /\ C = hole_contxt_c} + {subterm_rel sub_t (ctxt C0)},
                  In
                    (mtch_pair (ctxt C0) (nonempty_d_ev (ctxt C0) C sub_t ev_decom) b1)
-                   (M_ev g (ctxt C0, (p1, g)))))
+                   (Mev g (ctxt C0, (p1, g)))))
          as Happ.
        {apply (H (ctxt C0, (p1, g))
                  Hmrel_ctxt_C0
@@ -494,7 +494,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch_spec Hmatch1).
       }
       assert(exists l1_t1' l2_t1',
-                M_ev g (ctxt C0, (p1, g)) =
+                Mev g (ctxt C0, (p1, g)) =
                 l1_t1'
                   ++
                   (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1) :: l2_t1')
@@ -508,7 +508,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hin_ctxt_C0.
 
       assert(In (mtch_pair t2 (empty_d_ev t2) b2)
-                (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hin_t2.
       {assert(matching_tuple_order g
                 (list_term_c t2, (list_pat_c p2, g))
@@ -520,12 +520,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2 C sub_t p2 g b2 ->
                exists ev_decom : {sub_t = t2 /\ C = hole_contxt_c} + {subterm_rel sub_t t2},
                  In
                    (mtch_pair t2 (nonempty_d_ev t2 C sub_t ev_decom) b2)
-                   (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                   (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Happ.
        {apply (H (list_term_c t2, (list_pat_c p2, g))
                  Hmrel_t2
@@ -538,7 +538,7 @@ Module Completeness (pt : PatTermsSymb).
       }
       
       assert(exists l1_t2 l2_t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 l1_t2 ++ (mtch_pair t2 (empty_d_ev t2) b2) :: l2_t2)
         as Hsplit_t2.
       {apply (in_split _ _ Hin_t2).
@@ -607,37 +607,37 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end)
         (Hmatch1 : match_spec g t1 p1 g b1)
         (Hmatch2 : match_spec g (ctxt C0) p2 g b2)
         (H2 : b_union b1 b2 = Some b0),
         In (mtch_pair (ctxt (tail_contxt t1 C0)) (empty_d_ev (ctxt (tail_contxt t1 C0))) b0)
-           (M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
+           (Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t1 sub_t' b0 b1 b2 C C' C0 g g' H
           Hmatch1 Hmatch2 H2.
 
-      (* express M_ev in terms of function cons_case *)
+      (* express Mev in terms of function cons_case *)
       assert(exists (proof_subt : subterms (ctxt (tail_contxt t1 C0)) t1 (ctxt C0)),
-                M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))
+                Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))
                 =
                 (cons_case (ctxt (tail_contxt t1 C0)) t1 (ctxt C0) proof_subt
-                           (M_ev g (t1, (p1, g)))
-                           (M_ev g (ctxt C0, (list_pat_c p2, g)))))
+                           (Mev g (t1, (p1, g)))
+                           (Mev g (ctxt C0, (list_pat_c p2, g)))))
         as Hrec_call.
-      {apply M_ev_rew_cons_case_tail_ctxt.
+      {apply Mev_rew_cons_case_tail_ctxt.
       }
       inversion Hrec_call as [proof_subt Hrec_call'].
       clear Hrec_call.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair t1 (empty_d_ev t1) b1)
-                (M_ev g (t1, (p1, g))))
+                (Mev g (t1, (p1, g))))
         as Hin_t1.
       {assert(matching_tuple_order g
                 (t1, (p1, g))
@@ -648,12 +648,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1 C sub_t p1 g b1 ->
                exists ev_decom : {sub_t = t1 /\ C = hole_contxt_c} + {subterm_rel sub_t t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 C sub_t ev_decom) b1)
-                   (M_ev g (t1, (p1, g)))))
+                   (Mev g (t1, (p1, g)))))
          as Happ.
        {apply (H (t1, (p1, g))
                  Hmrel_t1
@@ -665,7 +665,7 @@ Module Completeness (pt : PatTermsSymb).
       }
 
       assert(exists l1_t1' l2_t1',
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 l1_t1'
                   ++
                   (mtch_pair t1 (empty_d_ev t1) b1) :: l2_t1')
@@ -679,7 +679,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hin_t1.
 
       assert(In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
-                (M_ev g (ctxt C0, (list_pat_c p2, g))))
+                (Mev g (ctxt C0, (list_pat_c p2, g))))
         as Hin_ctxt_C0.
       {assert(matching_tuple_order g
                 (ctxt C0, (list_pat_c p2, g))
@@ -690,13 +690,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g (ctxt C0) p2 g b2 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
-                  (M_ev g (ctxt C0, (list_pat_c p2, g)))) /\
+                  (Mev g (ctxt C0, (list_pat_c p2, g)))) /\
               (decompose_spec g (ctxt C0) C sub_t p2 g b2 ->
                exists ev_decom : {sub_t = ctxt C0 /\ C = hole_contxt_c} + {subterm_rel sub_t (ctxt C0)},
                  In
                    (mtch_pair (ctxt C0)
                               (nonempty_d_ev (ctxt C0) C sub_t ev_decom) b2)
-                   (M_ev g (ctxt C0, (list_pat_c p2, g)))))
+                   (Mev g (ctxt C0, (list_pat_c p2, g)))))
          as Happ.
        {apply (H (ctxt C0, (list_pat_c p2, g))
                  Hmrel_ctxt_C0
@@ -707,7 +707,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch_spec Hmatch2).
       }
       assert(exists l1_t2 l2_t2,
-                M_ev g (ctxt C0, (list_pat_c p2, g)) =
+                Mev g (ctxt C0, (list_pat_c p2, g)) =
                 l1_t2 ++ (mtch_pair (ctxt C0)
                                     (empty_d_ev (ctxt C0)) b2) :: l2_t2)
         as Hsplit_ctxt_C0.
@@ -778,30 +778,30 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end)
         (H1 : decompose_spec g t1 C0 t2 p1 g' b1)
         (H2 : pt.subterm_rel t2 t1)
         (Hmatch : match_spec g t2 p2 g b2)
         (H3 : b_union b1 b2 = Some b0),
         In (mtch_pair t1 (empty_d_ev t1) b0)
-           (M_ev g (t1, (inhole_pat p1 p2, g'))).
+           (Mev g (t1, (inhole_pat p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t1 sub_t' t2 b0 b1 b2 C C' C0 g g' H H1
              H2 Hmatch H3.
       (* unfold and simplify call *)
-      assert(M_ev g (t1, (inhole_pat p1 p2, g'))
+      assert(Mev g (t1, (inhole_pat p1 p2, g'))
              =
              inhole_case t1 p1 p2 g g'
                (fun (tpg2 : matching_tuple)
                   (_ : matching_tuple_order g tpg2 (t1, (inhole_pat p1 p2, g')))
-                => M_ev g tpg2))
+                => Mev g tpg2))
         as Hcall.
-      {apply M_ev_rew_inhole_case.
+      {apply Mev_rew_inhole_case.
       }
       rewrite Hcall.
 
@@ -809,7 +809,7 @@ Module Completeness (pt : PatTermsSymb).
       (* inspect content of rec. call *)
       assert(exists ev_decom : {t2 = t1 /\ C0 = hole_contxt_c} + {subterm_rel t2 t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 C0 t2 ev_decom) b1)
-                   (M_ev g (t1, (p1, g'))))
+                   (Mev g (t1, (p1, g'))))
         as Hrec_call.
       {assert(matching_tuple_order g
                 (t1, (p1, g'))
@@ -820,12 +820,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g' b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g')))) /\
+                  (Mev g (t1, (p1, g')))) /\
               (decompose_spec g t1 C0 t2 p1 g' b1 ->
                exists ev_decom : {t2 = t1 /\ C0 = hole_contxt_c} + {subterm_rel t2 t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 C0 t2 ev_decom) b1)
-                   (M_ev g (t1, (p1, g')))))
+                   (Mev g (t1, (p1, g')))))
          as Happ.
        {apply (H (t1, (p1, g'))
                  Hmrel_p1
@@ -840,12 +840,12 @@ Module Completeness (pt : PatTermsSymb).
       clear Hrec_call.
 
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g'))
+                Mev g (t1, (p1, g'))
                 =
                 mp1 ++ (mtch_pair t1 (nonempty_d_ev t1 C0 t2 ev_decom) b1) :: mp2)
         as Hsplit_rec_call.
       {apply (in_split (mtch_pair t1 (nonempty_d_ev t1 C0 t2 ev_decom) b1)
-                       (M_ev g (t1, (p1, g')))
+                       (Mev g (t1, (p1, g')))
                        Hrec_call').
       }
 
@@ -881,7 +881,7 @@ Module Completeness (pt : PatTermsSymb).
 
          (* inspect content of right rec. call *)
          assert(In (mtch_pair t2 (empty_d_ev t2) b2)
-                   (M_ev g (t2, (p2, g))))
+                   (Mev g (t2, (p2, g))))
            as Hin_p2.
          {assert(matching_tuple_order g
                    (t2, (p2, g))
@@ -892,13 +892,13 @@ Module Completeness (pt : PatTermsSymb).
 
            assert((match_spec g t2 p2 g b2 ->
                    In (mtch_pair t2 (empty_d_ev t2) b2)
-                      (M_ev g (t2, (p2, g)))) /\
+                      (Mev g (t2, (p2, g)))) /\
                   (decompose_spec g t2 C0 t2 p2 g b2 ->
                    exists ev_decom : {t2 = t2 /\ C0 = hole_contxt_c} + {subterm_rel t2 t2},
                      In
                        (mtch_pair t2
                                   (nonempty_d_ev t2 C0 t2 ev_decom) b2)
-                       (M_ev g (t2, (p2, g)))))
+                       (Mev g (t2, (p2, g)))))
              as Happ.
            {apply (H (t2, (p2, g))
                      Hmrel_p2
@@ -909,12 +909,12 @@ Module Completeness (pt : PatTermsSymb).
           }
 
           assert(exists mp1' mp2' : mtch_powset_ev t2,
-                    M_ev g (t2, (p2, g))
+                    Mev g (t2, (p2, g))
                     =
                     mp1' ++ (mtch_pair t2 (empty_d_ev t2) b2) :: mp2')
             as Hsplit_p2.
           {apply (in_split (mtch_pair t2 (empty_d_ev t2) b2)
-                           (M_ev g (t2, (p2, g)))
+                           (Mev g (t2, (p2, g)))
                            Hin_p2).
           }
           inversion Hsplit_p2 as [mp1' Hsplit_p2'].
@@ -951,29 +951,29 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end)
         (H1 : decompose_spec g t1 hole_contxt_c t1 p1 g' b1)
         (Hmatch : match_spec g t1 p2 g' b2)
         (H3 : b_union b1 b2 = Some b0),
         In (mtch_pair t1 (empty_d_ev t1) b0)
-           (M_ev g (t1, (inhole_pat p1 p2, g'))).
+           (Mev g (t1, (inhole_pat p1 p2, g'))).
     Proof.
       intros p1 p2 t1 b0 b1 b2 g g' H H1 Hmatch H3.
       (* unfold and simplify call *)
-      assert(M_ev g (t1, (inhole_pat p1 p2, g'))
+      assert(Mev g (t1, (inhole_pat p1 p2, g'))
              =
              inhole_case t1 p1 p2 g g'
                          (fun (tpg2 : matching_tuple)
                               (_ : matching_tuple_order g
                                      tpg2 (t1, (inhole_pat p1 p2, g')))
-                          => M_ev g tpg2))
+                          => Mev g tpg2))
         as Hcall.
-      {apply M_ev_rew_inhole_case.
+      {apply Mev_rew_inhole_case.
       }
       rewrite Hcall.
 
@@ -982,7 +982,7 @@ Module Completeness (pt : PatTermsSymb).
       assert(exists ev_decom : {t1 = t1 /\ hole_contxt_c = hole_contxt_c} + {subterm_rel t1 t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 hole_contxt_c t1 ev_decom)
                               b1)
-                   (M_ev g (t1, (p1, g'))))
+                   (Mev g (t1, (p1, g'))))
         as Hrec_call.
       {assert(matching_tuple_order g
                 (t1, (p1, g'))
@@ -993,12 +993,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g' b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g')))) /\
+                  (Mev g (t1, (p1, g')))) /\
               (decompose_spec g t1 hole_contxt_c t1 p1 g' b1 ->
                exists ev_decom : {t1 = t1 /\ hole_contxt_c = hole_contxt_c} + {subterm_rel t1 t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 hole_contxt_c t1 ev_decom) b1)
-                   (M_ev g (t1, (p1, g')))))
+                   (Mev g (t1, (p1, g')))))
          as Happ.
        {apply (H (t1, (p1, g'))
                  Hmrel_p1
@@ -1013,7 +1013,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hrec_call.
 
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g'))
+                Mev g (t1, (p1, g'))
                 =
                 mp1
                   ++
@@ -1021,7 +1021,7 @@ Module Completeness (pt : PatTermsSymb).
                   mp2)
         as Hsplit_rec_call.
       {apply (in_split (mtch_pair t1 (nonempty_d_ev t1 hole__t t1 ev_decom) b1)
-                       (M_ev g (t1, (p1, g')))
+                       (Mev g (t1, (p1, g')))
                        Hrec_call').
       }
 
@@ -1049,7 +1049,7 @@ Module Completeness (pt : PatTermsSymb).
 
         (* inspect content of right rec. call *)
         assert(In (mtch_pair t1 (empty_d_ev t1) b2)
-                  (M_ev g (t1, (p2, g'))))
+                  (Mev g (t1, (p2, g'))))
           as Hin_p2.
         {assert(matching_tuple_order g
                   (t1, (p2, g'))
@@ -1060,12 +1060,12 @@ Module Completeness (pt : PatTermsSymb).
 
          assert((match_spec g t1 p2 g' b2 ->
                  In (mtch_pair t1 (empty_d_ev t1) b2)
-                    (M_ev g (t1, (p2, g')))) /\
+                    (Mev g (t1, (p2, g')))) /\
                 (decompose_spec g t1 hole__t t1 p2 g' b2 ->
                  exists ev_decom : {t1 = t1 /\ hole_contxt_c = hole_contxt_c} + {subterm_rel t1 t1},
                    In
                      (mtch_pair t1 (nonempty_d_ev t1 hole__t t1 ev_decom) b2)
-                     (M_ev g (t1, (p2, g')))))
+                     (Mev g (t1, (p2, g')))))
            as Happ.
          {apply (H (t1, (p2, g'))
                    Hmrel_p2
@@ -1077,12 +1077,12 @@ Module Completeness (pt : PatTermsSymb).
         }
 
         assert(exists mp1' mp2' : mtch_powset_ev t1,
-                  (M_ev g (t1, (p2, g')))
+                  (Mev g (t1, (p2, g')))
                   =
                   mp1' ++ (mtch_pair t1 (empty_d_ev t1) b2) :: mp2')
           as Hsplit_p2.
         {apply (in_split (mtch_pair t1 (empty_d_ev t1) b2)
-                         (M_ev g (t1, (p2, g')))
+                         (Mev g (t1, (p2, g')))
                          Hin_p2).
         }
         inversion Hsplit_p2 as [mp1' Hsplit_p2'].
@@ -1157,20 +1157,20 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t = sub_t /\ hole_contxt_c = hole_contxt_c} + {subterm_rel sub_t sub_t},
         In
           (mtch_pair sub_t
                      (nonempty_d_ev sub_t pt.hole_contxt_c sub_t ev_decom)
-                     ∅) (M_ev g (sub_t, ([ ], g'))).
+                     ∅) (Mev g (sub_t, ([ ], g'))).
     Proof.
       intros sub_t' g g' H.
-      generalize (M_ev_rew_hole_case g g' sub_t').
+      generalize (Mev_rew_hole_case g g' sub_t').
       intro Hrew_call.
       inversion Hrew_call as [ev_decom Hrew_call'].
       clear Hrew_call.
@@ -1234,11 +1234,11 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ctxt (hd_contxt C0 t2) /\ 
                    (hd_c C'0 t2) = hole_contxt_c} + {subterm_rel sub_t' (ctxt (hd_contxt C0 t2))},
@@ -1246,7 +1246,7 @@ Module Completeness (pt : PatTermsSymb).
           (mtch_pair (ctxt (hd_contxt C0 t2))
                      (nonempty_d_ev (ctxt (hd_contxt C0 t2)) (hd_contxt C'0 t2) sub_t'
                                     ev_decom) b0)
-          (M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
+          (Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t sub_t' t2 b0 b1 b2 C C0 C'0 g g' H0
              Hdecom H1 H.
@@ -1259,7 +1259,7 @@ Module Completeness (pt : PatTermsSymb).
                               (nonempty_d_ev (ctxt C0) C'0
                                              sub_t' ev_decom)
                               b1)
-                   (M_ev g (ctxt C0, (p1, g))))
+                   (Mev g (ctxt C0, (p1, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g 
                 (ctxt C0, (p1, g)) 
@@ -1270,14 +1270,14 @@ Module Completeness (pt : PatTermsSymb).
        
        assert((match_spec g (ctxt C0) p1 g b1 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1)
-                  (M_ev g (ctxt C0, (p1, g)))) /\
+                  (Mev g (ctxt C0, (p1, g)))) /\
               (decompose_spec g (ctxt C0)  C'0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = ctxt C0 /\ C'0 = hole_contxt_c}
                                  + {subterm_rel sub_t' (ctxt C0)},
                  In (mtch_pair (ctxt C0)
                                (nonempty_d_ev (ctxt C0) C'0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (ctxt C0, (p1, g)))))
+                    (Mev g (ctxt C0, (p1, g)))))
          as Hmatch_decom.
        {apply (H (ctxt C0, (p1, g)) Hmrel sub_t' b1 C'0).
        }
@@ -1289,7 +1289,7 @@ Module Completeness (pt : PatTermsSymb).
       inversion Hdecom_in as [ev_decom Hdecom_in'].
       clear Hdecom_in.
       assert(exists mp1 mp2 : mtch_powset_ev (ctxt C0),
-                M_ev g (ctxt C0, (p1, g)) =
+                Mev g (ctxt C0, (p1, g)) =
                 mp1
                   ++
                   (mtch_pair (ctxt C0)
@@ -1306,7 +1306,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_ctxtC'.
 
       assert(In (mtch_pair t2 (empty_d_ev t2) b2)
-                (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (list_term_c t2, (list_pat_c p2, g)) (ctxt (hd_contxt C0 t2), (cp p1 p2, g')))
           as Hmrel.
@@ -1315,12 +1315,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2 C'0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = t2 /\ C'0 = hole_contxt_c} + {subterm_rel sub_t' t2},
                  In (mtch_pair t2 (nonempty_d_ev t2 C'0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                    (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (list_term_c t2, (list_pat_c p2, g)) Hmrel sub_t' 
                     b2 C'0).
@@ -1332,7 +1332,7 @@ Module Completeness (pt : PatTermsSymb).
       }
 
       assert(exists mp1' mp2' : mtch_powset_ev t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair t2 (empty_d_ev t2) b2)
@@ -1349,12 +1349,12 @@ Module Completeness (pt : PatTermsSymb).
 
       (* rewrite call and rec. calls *)
       assert(exists proof_subt : subterms (ctxt (hd_contxt C0 t2)) (ctxt C0) t2,
-                M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g')) =
+                Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g')) =
                 cons_case (ctxt (hd_contxt C0 t2)) (ctxt C0) t2 proof_subt
-                          (M_ev g (ctxt C0, (p1, g)))
-                          (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                          (Mev g (ctxt C0, (p1, g)))
+                          (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
-      {apply (M_ev_rew_cons_case_hd_ctxt g g' C0 t2 p1 p2).
+      {apply (Mev_rew_cons_case_hd_ctxt g g' C0 t2 p1 p2).
       }
       inversion Heq_call as [proof_subt Heq_call'].
       clear Heq_call.
@@ -1437,11 +1437,11 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t'  C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ctxt (hd_contxt C0 t2) /\ 
                       (tail_c (ctxt C0) C'0) = hole_contxt_c} +
@@ -1450,13 +1450,13 @@ Module Completeness (pt : PatTermsSymb).
           (mtch_pair (ctxt (hd_contxt C0 t2))
                      (nonempty_d_ev (ctxt (hd_contxt C0 t2)) (tail_contxt (ctxt C0) C'0) sub_t'
                                     ev_decom) b0)
-          (M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
+          (Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t sub_t' t2 b0 b1 b2 C C0 C'0 g g' H0 H1 Hdecom H.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1)
-                (M_ev g (ctxt C0, (p1, g))))
+                (Mev g (ctxt C0, (p1, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (ctxt C0, (p1, g)) (ctxt (hd_contxt C0 t2), (cp p1 p2, g')))
           as Hmrel.
@@ -1465,13 +1465,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g (ctxt C0) p1 g b1 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b1)
-                  (M_ev g (ctxt C0, (p1, g)))) /\
+                  (Mev g (ctxt C0, (p1, g)))) /\
               (decompose_spec g (ctxt C0) C0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = ctxt C0 /\ C0 = hole_contxt_c} + {subterm_rel sub_t' (ctxt C0)},
                  In (mtch_pair (ctxt C0)
                                (nonempty_d_ev (ctxt C0) C0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (ctxt C0, (p1, g)))))
+                    (Mev g (ctxt C0, (p1, g)))))
          as Hmatch_decom.
        {apply (H (ctxt C0, (p1, g)) Hmrel sub_t' b1 C0).
        }
@@ -1481,7 +1481,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch H1).
       }
       assert(exists mp1 mp2 : mtch_powset_ev (ctxt C0),
-                M_ev g (ctxt C0, (p1, g)) =
+                Mev g (ctxt C0, (p1, g)) =
                 mp1
                   ++
                   (mtch_pair (ctxt C0)
@@ -1502,7 +1502,7 @@ Module Completeness (pt : PatTermsSymb).
                               (nonempty_d_ev t2 C'0
                                              sub_t' ev_decom)
                               b2)
-                   (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                   (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g (list_term_c t2, (list_pat_c p2, g)) (ctxt (hd_contxt C0 t2), (cp p1 p2, g')))
           as Hmrel.
@@ -1511,13 +1511,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2 C'0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = t2 /\ (list_contxt_c C'0) = hole_contxt_c} + {subterm_rel sub_t' t2},
                  In (mtch_pair t2
                                (nonempty_d_ev t2 C'0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                    (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (list_term_c t2, (list_pat_c p2, g)) Hmrel sub_t' b2 C'0).
        }
@@ -1531,7 +1531,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hdecom_in.
 
       assert(exists mp1' mp2' : mtch_powset_ev t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair t2 (nonempty_d_ev t2 C'0 sub_t' ev_decom) b2)
@@ -1548,12 +1548,12 @@ Module Completeness (pt : PatTermsSymb).
 
       (* rewrite call and rec. calls *)
       assert(exists proof_subt : subterms (ctxt (hd_contxt C0 t2)) (ctxt C0) t2,
-                M_ev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g')) =
+                Mev g (ctxt (hd_contxt C0 t2), (cp p1 p2, g')) =
                 cons_case (ctxt (hd_contxt C0 t2)) (ctxt C0) t2 proof_subt
-                          (M_ev g (ctxt C0, (p1, g)))
-                          (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                          (Mev g (ctxt C0, (p1, g)))
+                          (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
-      {apply (M_ev_rew_cons_case_hd_ctxt g g' C0 t2 p1 p2).
+      {apply (Mev_rew_cons_case_hd_ctxt g g' C0 t2 p1 p2).
       }
       inversion Heq_call as [proof_subt Heq_call'].
       clear Heq_call.
@@ -1629,11 +1629,11 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t'  C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ctxt (tail_contxt t1 C0) /\ 
                       (hd_c C'0 (list_contxt_2_list_term C0)) = hole_contxt_c} +
@@ -1643,7 +1643,7 @@ Module Completeness (pt : PatTermsSymb).
                      (nonempty_d_ev (ctxt (tail_contxt t1 C0)) 
                         (hd_contxt C'0 (list_contxt_2_list_term C0)) sub_t'
                                     ev_decom) b0)
-          (M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
+          (Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 t1 sub_t' b0 b1 b2 C'0 C0 g g' H0 Hdecom H1
              H.
@@ -1654,7 +1654,7 @@ Module Completeness (pt : PatTermsSymb).
                               (nonempty_d_ev t1 C'0
                                              sub_t' ev_decom)
                               b1)
-                   (M_ev g (t1, (p1, g))))
+                   (Mev g (t1, (p1, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g (t1, (p1, g)) (ctxt (tail_contxt t1 C0), (cp p1 p2, g')))
           as Hmrel.
@@ -1663,14 +1663,14 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1  C'0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = t1 /\ C'0 = hole_contxt_c}
                                  + {subterm_rel sub_t' t1},
                  In (mtch_pair t1
                                (nonempty_d_ev t1 C'0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (t1, (p1, g)))))
+                    (Mev g (t1, (p1, g)))))
          as Hmatch_decom.
        {apply (H (t1, (p1, g)) Hmrel sub_t' b1 C'0).
        }
@@ -1682,7 +1682,7 @@ Module Completeness (pt : PatTermsSymb).
       inversion Hdecom_in as [ev_decom Hdecom_in'].
       clear Hdecom_in.
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 mp1
                   ++
                   (mtch_pair t1
@@ -1699,7 +1699,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t1'.
 
       assert(In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
-                (M_ev g (ctxt C0, (list_pat_c p2, g))))
+                (Mev g (ctxt C0, (list_pat_c p2, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (ctxt C0, (list_pat_c p2, g)) (ctxt (tail_contxt t1 C0), (cp p1 p2, g')))
           as Hmrel.
@@ -1708,13 +1708,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g (ctxt C0) p2 g b2 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
-                  (M_ev g (ctxt C0, (list_pat_c p2, g)))) /\
+                  (Mev g (ctxt C0, (list_pat_c p2, g)))) /\
               (decompose_spec g (ctxt C0) C'0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = ctxt C0 /\ C'0 = hole_contxt_c} + {subterm_rel sub_t' (ctxt C0)},
                  In (mtch_pair (ctxt C0)
                                (nonempty_d_ev (ctxt C0) C'0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (ctxt C0, (list_pat_c p2, g)))))
+                    (Mev g (ctxt C0, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (ctxt C0, (list_pat_c p2, g)) Hmrel sub_t' b2 C'0).
        }
@@ -1725,7 +1725,7 @@ Module Completeness (pt : PatTermsSymb).
       }
 
       assert(exists mp1' mp2' : mtch_powset_ev (ctxt C0),
-                M_ev g (ctxt C0, (list_pat_c p2, g)) =
+                Mev g (ctxt C0, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
@@ -1742,12 +1742,12 @@ Module Completeness (pt : PatTermsSymb).
 
       (* rewrite call and rec. calls *)
       assert(exists proof_subt : subterms (ctxt (tail_contxt t1 C0)) t1 (ctxt C0),
-                M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g')) =
+                Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g')) =
                 cons_case (ctxt (tail_contxt t1 C0)) t1 (ctxt C0) proof_subt
-                          (M_ev g (t1, (p1, g)))
-                          (M_ev g (ctxt C0, (list_pat_c p2, g))))
+                          (Mev g (t1, (p1, g)))
+                          (Mev g (ctxt C0, (list_pat_c p2, g))))
         as Heq_call.
-      {apply (M_ev_rew_cons_case_tail_ctxt g g' t1 C0 p1 p2).
+      {apply (Mev_rew_cons_case_tail_ctxt g g' t1 C0 p1 p2).
       }
       inversion Heq_call as [proof_subt Heq_call'].
       clear Heq_call.
@@ -1835,24 +1835,24 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ct t1 t2 /\ (tail_c t1 C0) = hole_contxt_c} + {subterm_rel sub_t' (ct t1 t2)},
         In (mtch_pair (ct t1 t2)
                       (nonempty_d_ev (ct t1 t2) (tail_contxt t1 C0) sub_t' ev_decom)
                       b0)
-           (M_ev g (ct t1 t2, (cp p1 p2, g'))).
+           (Mev g (ct t1 t2, (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t1 sub_t' t2 b0 b1 b2 C C0 g g' H0 H1
              Hdecom H.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair t1 (empty_d_ev t1) b1)
-                (M_ev g (t1, (p1, g))))
+                (Mev g (t1, (p1, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (t1, (p1, g)) (ct t1 t2, (cp p1 p2, g')))
           as Hmrel.
@@ -1861,14 +1861,14 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1  C0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = t1 /\ (list_contxt_c C0) = hole_contxt_c}
                                  + {subterm_rel sub_t' t1},
                  In (mtch_pair t1
                                (nonempty_d_ev t1 C0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (t1, (p1, g)))))
+                    (Mev g (t1, (p1, g)))))
          as Hmatch_decom.
        {apply (H (t1, (p1, g)) Hmrel sub_t' b1 C0).
        }
@@ -1878,7 +1878,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch H1).
       }
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 mp1
                   ++
                   (mtch_pair t1
@@ -1899,7 +1899,7 @@ Module Completeness (pt : PatTermsSymb).
                               (nonempty_d_ev t2 C0
                                              sub_t' ev_decom)
                               b2)
-                   (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                   (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g (list_term_c t2, (list_pat_c p2, g)) (ct t1 t2, (cp p1 p2, g')))
           as Hmrel.
@@ -1908,14 +1908,14 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2  C0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = t2 /\ (list_contxt_c C0) = hole_contxt_c}
                                  + {subterm_rel sub_t' t2},
                  In (mtch_pair t2
                                (nonempty_d_ev t2 C0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                    (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (list_term_c t2, (list_pat_c p2, g)) Hmrel sub_t' b2 C0).
        }
@@ -1929,7 +1929,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hdecom_in.
 
       assert(exists mp1' mp2' : mtch_powset_ev t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair t2 (nonempty_d_ev t2 C0 sub_t' ev_decom) b2)
@@ -1945,12 +1945,12 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t2'.
 
       (* rewrite call and rec. calls *)
-      assert(M_ev g (ct t1 t2, (cp p1 p2, g')) =
+      assert(Mev g (ct t1 t2, (cp p1 p2, g')) =
                cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
-                 (M_ev g (t1, (p1, g)))
-                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                 (Mev g (t1, (p1, g)))
+                 (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
-      {apply (M_ev_rew_cons_case g g' t1 t2 p1 p2).
+      {apply (Mev_rew_cons_case g g' t1 t2 p1 p2).
       }
       rewrite Heq_call.
       clear Heq_call.
@@ -2023,17 +2023,17 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ct t1 t2 /\ (hd_c C0 t2) = hole_contxt_c} + {subterm_rel sub_t' (ct t1 t2)},
         In
           (mtch_pair (ct t1 t2)
                      (nonempty_d_ev (ct t1 t2) (hd_contxt C0 t2) sub_t' ev_decom) b0)
-          (M_ev g (ct t1 t2, (cp p1 p2, g'))).
+          (Mev g (ct t1 t2, (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t1 sub_t' t2 b0 b1 b2 C C0 g g' H0 Hdecom
              H1 H.
@@ -2042,7 +2042,7 @@ Module Completeness (pt : PatTermsSymb).
       assert(exists ev_decom : {sub_t' = t1 /\ C0 = hole_contxt_c} + {subterm_rel sub_t' t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 C0 sub_t' ev_decom)
                               b1)
-                   (M_ev g (t1, (p1, g))))
+                   (Mev g (t1, (p1, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g (t1, (p1, g)) (ct t1 t2, (cp p1 p2, g')))
           as Hmrel.
@@ -2051,12 +2051,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1 C0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = t1 /\ C0 = hole_contxt_c} + {subterm_rel sub_t' t1},
                  In (mtch_pair t1 (nonempty_d_ev t1 C0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (t1, (p1, g)))))
+                    (Mev g (t1, (p1, g)))))
          as Hmatch_decom.
        {apply (H (t1, (p1, g)) Hmrel sub_t' b1 C0).
        }
@@ -2068,7 +2068,7 @@ Module Completeness (pt : PatTermsSymb).
       inversion Hdecom_in as [ev_decom Hdecom_in'].
       clear Hdecom_in.
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 mp1 ++ (mtch_pair t1 (nonempty_d_ev t1 C0 sub_t' ev_decom) b1)
                   :: mp2)
         as Hsplit_t1.
@@ -2082,7 +2082,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t1'.
 
       assert(In (mtch_pair t2 (empty_d_ev t2) b2)
-                (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (list_term_c t2, (list_pat_c p2, g)) (ct t1 t2, (cp p1 p2, g')))
           as Hmrel.
@@ -2091,12 +2091,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t2 p2 g b2 ->
                In (mtch_pair t2 (empty_d_ev t2) b2)
-                  (M_ev g (list_term_c t2, (list_pat_c p2, g)))) /\
+                  (Mev g (list_term_c t2, (list_pat_c p2, g)))) /\
               (decompose_spec g t2 C0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = t2 /\ C0 = hole_contxt_c} + {subterm_rel sub_t' t2},
                  In (mtch_pair t2 (nonempty_d_ev t2 C0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (list_term_c t2, (list_pat_c p2, g)))))
+                    (Mev g (list_term_c t2, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (list_term_c t2, (list_pat_c p2, g)) Hmrel sub_t' b2 C0).
        }
@@ -2106,7 +2106,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch H1).
       }
       assert(exists mp1' mp2' : mtch_powset_ev t2,
-                M_ev g (list_term_c t2, (list_pat_c p2, g)) =
+                Mev g (list_term_c t2, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair t2 (empty_d_ev t2) b2)
@@ -2122,12 +2122,12 @@ Module Completeness (pt : PatTermsSymb).
       clear Hsplit_t2'.
 
       (* rewrite call and rec. calls *)
-      assert(M_ev g (ct t1 t2, (cp p1 p2, g')) =
+      assert(Mev g (ct t1 t2, (cp p1 p2, g')) =
                cons_case (ct t1 t2) t1 t2 (build_subterm_proof t1 t2)
-                 (M_ev g (t1, (p1, g)))
-                 (M_ev g (list_term_c t2, (list_pat_c p2, g))))
+                 (Mev g (t1, (p1, g)))
+                 (Mev g (list_term_c t2, (list_pat_c p2, g))))
         as Heq_call.
-      {apply M_ev_rew_cons_case.
+      {apply Mev_rew_cons_case.
       }
       rewrite Heq_call.
       clear Heq_call.
@@ -2203,11 +2203,11 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = ctxt (tail_contxt t1 C0) /\ 
                       (tail_c t1 C'0) = hole_contxt_c} +
@@ -2216,14 +2216,14 @@ Module Completeness (pt : PatTermsSymb).
           (mtch_pair (ctxt (tail_contxt t1 C0))
                      (nonempty_d_ev (ctxt (tail_contxt t1 C0)) (tail_contxt t1 C'0) sub_t'
                                     ev_decom) b0)
-          (M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
+          (Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t1 sub_t' b0 b1 b2 C C0 C'0 g g' H0 H1 Hdecom
              H.
 
       (* inspect content of recursive calls *)
       assert(In (mtch_pair t1 (empty_d_ev t1) b1)
-                (M_ev g (t1, (p1, g))))
+                (Mev g (t1, (p1, g))))
         as Hmatch_in.
       {assert(matching_tuple_order g (t1, (p1, g)) (ctxt (tail_contxt t1 C0), (cp p1 p2, g')))
           as Hmrel.
@@ -2232,14 +2232,14 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p1 g b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p1, g)))) /\
+                  (Mev g (t1, (p1, g)))) /\
               (decompose_spec g t1 C'0 sub_t' p1 g b1 ->
                exists ev_decom : {sub_t' = t1 /\ (list_contxt_c C'0) = hole_contxt_c}
                                  + {subterm_rel sub_t' t1},
                  In (mtch_pair t1
                                (nonempty_d_ev t1 C'0 sub_t' ev_decom)
                                b1)
-                    (M_ev g (t1, (p1, g)))))
+                    (Mev g (t1, (p1, g)))))
          as Hmatch_decom.
        {apply (H (t1, (p1, g)) Hmrel sub_t' b1 C'0).
        }
@@ -2249,7 +2249,7 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hmatch H1).
       }
       assert(exists mp1 mp2 : mtch_powset_ev t1,
-                M_ev g (t1, (p1, g)) =
+                Mev g (t1, (p1, g)) =
                 mp1
                   ++
                   (mtch_pair t1
@@ -2272,7 +2272,7 @@ Module Completeness (pt : PatTermsSymb).
                               (nonempty_d_ev (ctxt C0) C'0
                                              sub_t' ev_decom)
                               b2)
-                   (M_ev g (ctxt C0, (list_pat_c p2, g))))
+                   (Mev g (ctxt C0, (list_pat_c p2, g))))
         as Hdecom_in.
       {assert(matching_tuple_order g (ctxt C0, (list_pat_c p2, g)) (ctxt (tail_contxt t1 C0), (cp p1 p2, g')))
           as Hmrel.
@@ -2281,14 +2281,14 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g (ctxt C0) p2 g b2 ->
                In (mtch_pair (ctxt C0) (empty_d_ev (ctxt C0)) b2)
-                  (M_ev g (ctxt C0, (list_pat_c p2, g)))) /\
+                  (Mev g (ctxt C0, (list_pat_c p2, g)))) /\
               (decompose_spec g (ctxt C0) C'0 sub_t' p2 g b2 ->
                exists ev_decom : {sub_t' = ctxt C0 /\ (list_contxt_c C'0) = hole_contxt_c}
                             + {subterm_rel sub_t' (ctxt C0)},
                  In (mtch_pair (ctxt C0)
                                (nonempty_d_ev (ctxt C0) C'0 sub_t' ev_decom)
                                b2)
-                    (M_ev g (ctxt C0, (list_pat_c p2, g)))))
+                    (Mev g (ctxt C0, (list_pat_c p2, g)))))
          as Hmatch_decom.
        {apply (H (ctxt C0, (list_pat_c p2, g)) Hmrel sub_t' b2 C'0).
        }
@@ -2302,7 +2302,7 @@ Module Completeness (pt : PatTermsSymb).
       clear Hdecom_in.
 
       assert(exists mp1' mp2' : mtch_powset_ev (ctxt C0),
-                M_ev g (ctxt C0, (list_pat_c p2, g)) =
+                Mev g (ctxt C0, (list_pat_c p2, g)) =
                 mp1'
                   ++
                   (mtch_pair (ctxt C0)
@@ -2321,12 +2321,12 @@ Module Completeness (pt : PatTermsSymb).
 
       (* rewrite call and rec. calls *)
       assert(exists proof_subt : subterms (ctxt (tail_contxt t1 C0)) t1 (ctxt C0),
-                M_ev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g')) =
+                Mev g (ctxt (tail_contxt t1 C0), (cp p1 p2, g')) =
                 cons_case (ctxt (tail_contxt t1 C0)) t1 (ctxt C0) proof_subt
-                          (M_ev g (t1, (p1, g)))
-                          (M_ev g (ctxt C0, (list_pat_c p2, g))))
+                          (Mev g (t1, (p1, g)))
+                          (Mev g (ctxt C0, (list_pat_c p2, g))))
         as Heq_call.
-      {apply (M_ev_rew_cons_case_tail_ctxt g g' t1 C0 p1 p2).
+      {apply (Mev_rew_cons_case_tail_ctxt g g' t1 C0 p1 p2).
       }
       inversion Heq_call as [proof_subt Heq_call'].
       clear Heq_call.
@@ -2401,15 +2401,15 @@ Module Completeness (pt : PatTermsSymb).
             forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                    (M_ev g (t', (p', G2'))))
+                    (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
         In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) ∅)
-           (M_ev g (t1, (nt n, g'))).
+           (Mev g (t1, (nt n, g'))).
     Proof.
       intros p0 sub_t t1 sub_t' b0 C C' g g' n proof Hdecom H.
 
@@ -2422,18 +2422,18 @@ Module Completeness (pt : PatTermsSymb).
       }
       assert(exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b0)
-                   (M_ev g (t1, (p0, remove_prod (n, p0) g' proof))))
+                   (Mev g (t1, (p0, remove_prod (n, p0) g' proof))))
         as IH.
       {assert((match_spec g t1 p0 (remove_prod (n, p0) g' proof) b0 ->
                In (mtch_pair t1 (empty_d_ev t1) b0)
-                  (M_ev g (t1, (p0, (remove_prod (n, p0) g' proof)))))
+                  (Mev g (t1, (p0, (remove_prod (n, p0) g' proof)))))
               /\
               (decompose_spec g t1 C' sub_t' p0
                               (remove_prod (n, p0) g' proof) b0 ->
                exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b0)
-                   (M_ev g (t1, (p0, (remove_prod (n, p0) g' proof))))))
+                   (Mev g (t1, (p0, (remove_prod (n, p0) g' proof))))))
           as Happ.
        {apply (H (t1, (p0, remove_prod (n, p0) g' proof))
                  Hnt_rel
@@ -2444,8 +2444,8 @@ Module Completeness (pt : PatTermsSymb).
        apply (Hev_decom Hdecom).
       }
 
-      (* reduce call M_ev nt n *)
-      rewrite (M_ev_rew_nt_case g g' t1 n).
+      (* reduce call Mev nt n *)
+      rewrite (Mev_rew_nt_case g g' t1 n).
       unfold nt_case.
       assert(exists (proof' : prod_in_g (n, p0) g') G1' G1'',
                 get_rhs g' n = G1' ++ ((exist (fun pa =>
@@ -2478,7 +2478,7 @@ Module Completeness (pt : PatTermsSymb).
       rewrite in_app_iff.
       left.
       assert(exists l1 l2,
-                M_ev g (t1, (p0, remove_prod (n, p0) g' proof'))
+                Mev g (t1, (p0, remove_prod (n, p0) g' proof'))
                 =
                 l1 ++ (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b0) :: l2)
         as Hin.
@@ -2516,32 +2516,32 @@ Module Completeness (pt : PatTermsSymb).
               (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In
                    (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom)
-                              b') (M_ev g (t', (p', G2'))))
+                              b') (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t' = t0 /\ (context_com C1 C2) = hole_contxt_c} + {subterm_rel sub_t' t0},
         In
           (mtch_pair t0
                      (nonempty_d_ev t0 (context_com C1 C2) sub_t' ev_decom)
-                     b0) (M_ev g (t0, (inhole_pat p1 p2, g'))).
+                     b0) (Mev g (t0, (inhole_pat p1 p2, g'))).
     Proof.
       intros p1 p2 sub_t t0 t1 sub_t' b0 b1 b2 C C1 C2 g g' H0 H1
              Hdecom1 Hdecom2 H.
 
       (* unfold and simplify call *)
-      assert(M_ev g (t0, (inhole_pat p1 p2, g'))
+      assert(Mev g (t0, (inhole_pat p1 p2, g'))
              =
              inhole_case t0 p1 p2 g g'
                          (fun (tpg2 : matching_tuple)
                               (_ : matching_tuple_order g tpg2
                                      (t0, (inhole_pat p1 p2, g')))
-                          => M_ev g tpg2))
+                          => Mev g tpg2))
         as Hcall.
-      {apply M_ev_rew_inhole_case.
+      {apply Mev_rew_inhole_case.
       }
       rewrite Hcall.
 
@@ -2549,7 +2549,7 @@ Module Completeness (pt : PatTermsSymb).
       (* inspect content of rec. call *)
       assert(exists ev_decom : {t1 = t0 /\ C1 = hole_contxt_c} + {subterm_rel t1 t0},
                 In (mtch_pair t0 (nonempty_d_ev t0 C1 t1 ev_decom) b1)
-                   (M_ev g (t0, (p1, g'))))
+                   (Mev g (t0, (p1, g'))))
         as Hrec_call.
       {assert(matching_tuple_order g (t0, (p1, g')) (t0, (inhole_pat p1 p2, g')))
           as Hmrel_p1.
@@ -2558,13 +2558,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t0 p1 g' b1 ->
                In (mtch_pair t0 (empty_d_ev t0) b1)
-                  (M_ev g (t0, (p1, g')))) /\
+                  (Mev g (t0, (p1, g')))) /\
               (decompose_spec g t0 C1 t1 p1 g' b1 ->
                exists ev_decom : {t1 = t0 /\ C1 = hole_contxt_c} + {subterm_rel t1 t0},
                  In
                    (mtch_pair t0
                               (nonempty_d_ev t0 C1 t1 ev_decom) b1)
-                   (M_ev g (t0, (p1, g')))))
+                   (Mev g (t0, (p1, g')))))
          as Happ.
        {apply (H (t0, (p1, g'))
                  Hmrel_p1
@@ -2579,14 +2579,14 @@ Module Completeness (pt : PatTermsSymb).
       clear Hrec_call.
 
       assert(exists mp1 mp2 : mtch_powset_ev t0,
-                M_ev g (t0, (p1, g'))
+                Mev g (t0, (p1, g'))
                 =
                 mp1
                   ++
                   (mtch_pair t0 (nonempty_d_ev t0 C1 t1 ev_decom) b1) :: mp2)
         as Hsplit_rec_call.
       {apply (in_split (mtch_pair t0 (nonempty_d_ev t0 C1 t1 ev_decom) b1)
-                       (M_ev g (t0, (p1, g')))
+                       (Mev g (t0, (p1, g')))
                        Hrec_call').
       }
       clear Hrec_call'.
@@ -2620,7 +2620,7 @@ Module Completeness (pt : PatTermsSymb).
          intros.
          assert(exists ev_decom : {sub_t' = t1 /\ C2 = hole_contxt_c} + {subterm_rel sub_t' t1},
                    In (mtch_pair t1 (nonempty_d_ev t1 C2 sub_t' ev_decom) b2)
-                      (M_ev g (t1, (p2, g))))
+                      (Mev g (t1, (p2, g))))
            as Hrec_call.
          {assert(matching_tuple_order g (t1, (p2, g)) (t0, (inhole_pat p1 p2, g')))
              as Hmrel_p2.
@@ -2629,13 +2629,13 @@ Module Completeness (pt : PatTermsSymb).
           
           assert((match_spec g t1 p2 g b2 ->
                   In (mtch_pair t1 (empty_d_ev t1) b2)
-                     (M_ev g (t1, (p2, g)))) /\
+                     (Mev g (t1, (p2, g)))) /\
                  (decompose_spec g t1 C2 sub_t' p2 g b2 ->
                   exists ev_decom : {sub_t' = t1 /\ C2 = hole_contxt_c} + {subterm_rel sub_t' t1},
                     In
                       (mtch_pair t1
                                  (nonempty_d_ev t1 C2 sub_t' ev_decom) b2)
-                      (M_ev g (t1, (p2, g)))))
+                      (Mev g (t1, (p2, g)))))
             as Happ.
           {apply (H (t1, (p2, g))
                     Hmrel_p2
@@ -2649,7 +2649,7 @@ Module Completeness (pt : PatTermsSymb).
          clear Hrec_call.
 
          assert(exists mp1 mp2 : mtch_powset_ev t1,
-                   M_ev g (t1, (p2, g))
+                   Mev g (t1, (p2, g))
                    =
                    mp1
                      ++
@@ -2658,7 +2658,7 @@ Module Completeness (pt : PatTermsSymb).
            as Hsplit_rec_call.
          {apply (in_split (mtch_pair t1 (nonempty_d_ev t1 C2 sub_t'
                                                        ev_decom_sub_t') b2)
-                          (M_ev g (t1, (p2, g)))
+                          (Mev g (t1, (p2, g)))
                           Hrec_call').
          }
          clear Hrec_call'.
@@ -2762,32 +2762,32 @@ Module Completeness (pt : PatTermsSymb).
               (C' : pt.contxt),
               (match_spec g t' p' G2' b' ->
                In (mtch_pair t' (empty_d_ev t') b')
-                  (M_ev g (t', (p', G2')))) /\
+                  (Mev g (t', (p', G2')))) /\
               (decompose_spec g t' C' sub_t' p' G2' b' ->
                exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                  In
                    (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom)
-                              b') (M_ev g (t', (p', G2'))))
+                              b') (Mev g (t', (p', G2'))))
             end),
       exists ev_decom : {sub_t = t /\ (context_com hole__t C) = hole_contxt_c} + {subterm_rel sub_t t},
         In
           (mtch_pair t
                      (nonempty_d_ev t (context_com hole__t C) sub_t ev_decom)
-                     b0) (M_ev g (t, (inhole_pat p1 p2, g'))).
+                     b0) (Mev g (t, (inhole_pat p1 p2, g'))).
     Proof.
       intros p1 p2 t0 sub_t b0 b1 b2 C g g' H0
              Hdecom1 Hdecom2 H.
 
       (* unfold and simplify call *)
-      assert(M_ev g (t0, (inhole_pat p1 p2, g'))
+      assert(Mev g (t0, (inhole_pat p1 p2, g'))
              =
              inhole_case t0 p1 p2 g g'
                          (fun (tpg2 : matching_tuple)
                               (_ : matching_tuple_order g tpg2
                                       (t0, (inhole_pat p1 p2, g')))
-                          => M_ev g tpg2))
+                          => Mev g tpg2))
         as Hcall.
-      {apply M_ev_rew_inhole_case.
+      {apply Mev_rew_inhole_case.
       }
       rewrite Hcall.
 
@@ -2795,7 +2795,7 @@ Module Completeness (pt : PatTermsSymb).
       (* inspect content of rec. call *)
       assert(exists ev_decom : {t0 = t0 /\ hole__t = hole_contxt_c} + {subterm_rel t0 t0},
                 In (mtch_pair t0 (nonempty_d_ev t0 hole__t t0 ev_decom) b1)
-                   (M_ev g (t0, (p1, g'))))
+                   (Mev g (t0, (p1, g'))))
         as Hrec_call.
       {assert(matching_tuple_order g (t0, (p1, g')) (t0, (inhole_pat p1 p2, g')))
           as Hmrel_p1.
@@ -2804,13 +2804,13 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t0 p1 g' b1 ->
                In (mtch_pair t0 (empty_d_ev t0) b1)
-                  (M_ev g (t0, (p1, g')))) /\
+                  (Mev g (t0, (p1, g')))) /\
               (decompose_spec g t0 hole__t t0 p1 g' b1 ->
                exists ev_decom : {t0 = t0 /\ hole__t = hole_contxt_c} + {subterm_rel t0 t0},
                  In
                    (mtch_pair t0
                               (nonempty_d_ev t0 hole__t t0 ev_decom) b1)
-                   (M_ev g (t0, (p1, g')))))
+                   (Mev g (t0, (p1, g')))))
          as Happ.
        {apply (H (t0, (p1, g'))
                  Hmrel_p1
@@ -2825,14 +2825,14 @@ Module Completeness (pt : PatTermsSymb).
       clear Hrec_call.
 
       assert(exists mp1 mp2 : mtch_powset_ev t0,
-                M_ev g (t0, (p1, g'))
+                Mev g (t0, (p1, g'))
                 =
                 mp1
                   ++
                   (mtch_pair t0 (nonempty_d_ev t0 hole__t t0 ev_decom) b1) :: mp2)
         as Hsplit_rec_call.
       {apply (in_split (mtch_pair t0 (nonempty_d_ev t0 hole__t t0 ev_decom) b1)
-                       (M_ev g (t0, (p1, g')))
+                       (Mev g (t0, (p1, g')))
                        Hrec_call').
       }
       clear Hrec_call'.
@@ -2857,7 +2857,7 @@ Module Completeness (pt : PatTermsSymb).
          (* inspect content of right rec. call *)
          assert(exists ev_decom : {sub_t = t0 /\ C = hole_contxt_c} + {subterm_rel sub_t t0},
                    In (mtch_pair t0 (nonempty_d_ev t0 C sub_t ev_decom) b2)
-                      (M_ev g (t0, (p2, g'))))
+                      (Mev g (t0, (p2, g'))))
           as Hrec_call.
          {assert(matching_tuple_order g (t0, (p2, g')) (t0, (inhole_pat p1 p2, g')))
              as Hmrel_p2.
@@ -2866,13 +2866,13 @@ Module Completeness (pt : PatTermsSymb).
 
           assert((match_spec g t0 p2 g' b2 ->
                   In (mtch_pair t0 (empty_d_ev t0) b2)
-                     (M_ev g (t0, (p2, g')))) /\
+                     (Mev g (t0, (p2, g')))) /\
                  (decompose_spec g t0 C sub_t p2 g' b2 ->
                   exists ev_decom : {sub_t = t0 /\ C = hole_contxt_c} + {subterm_rel sub_t t0},
                     In
                       (mtch_pair t0
                                  (nonempty_d_ev t0 C sub_t ev_decom) b2)
-                      (M_ev g (t0, (p2, g')))))
+                      (Mev g (t0, (p2, g')))))
             as Happ.
           {apply (H (t0, (p2, g'))
                     Hmrel_p2
@@ -2887,7 +2887,7 @@ Module Completeness (pt : PatTermsSymb).
 
          exists ev_decom_sub_t'.
          assert(exists mp1 mp2 : mtch_powset_ev t0,
-                   M_ev g (t0, (p2, g'))
+                   Mev g (t0, (p2, g'))
                    =
                    mp1
                      ++
@@ -2896,7 +2896,7 @@ Module Completeness (pt : PatTermsSymb).
            as Hsplit_rec_call.
          {apply (in_split (mtch_pair t0 (nonempty_d_ev t0 C sub_t
                                                        ev_decom_sub_t') b2)
-                          (M_ev g (t0, (p2, g')))
+                          (Mev g (t0, (p2, g')))
                           Hrec_call').
          }
          clear Hrec_call'.
@@ -2985,27 +2985,27 @@ Module Completeness (pt : PatTermsSymb).
                 forall (sub_t' : pt.term) (b' : bindings) (C' : pt.contxt),
                   (match_spec g t' p' G2' b' ->
                    In (mtch_pair t' (empty_d_ev t') b')
-                     (M_ev g (t', (p', G2')))) /\
+                     (Mev g (t', (p', G2')))) /\
                     (decompose_spec g t' C' sub_t' p' G2' b' ->
                      exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                        In (mtch_pair t' (nonempty_d_ev t' C' sub_t' ev_decom) b')
-                         (M_ev g (t', (p', G2'))))
+                         (Mev g (t', (p', G2'))))
             end),
         exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
           In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b0)
-             (M_ev g (t1, (name x p0, g'))).
+             (Mev g (t1, (name x p0, g'))).
     Proof.
       intros p0 sub_t t1 sub_t' b0 b1 C C' g g' x H0 Hdecom H.
 
       (* we show that
             In (mtch_pair t0 (empty_d_ev t0) bp)
-               (M_ev (m_rel_e (g, t0) (p0, g')) *)
-      rewrite (M_ev_rew_name_case g g' t1 p0 x).
+               (Mev (m_rel_e (g, t0) (p0, g')) *)
+      rewrite (Mev_rew_name_case g g' t1 p0 x).
       simpl.
 
       assert(exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                 In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1)
-                   (M_ev g (t1, (p0, g')))
+                   (Mev g (t1, (p0, g')))
             )
         as Hinpair_inst.
       {assert(matching_tuple_order g (t1, (p0, g')) (t1, (name x p0, g')))
@@ -3015,12 +3015,12 @@ Module Completeness (pt : PatTermsSymb).
 
        assert((match_spec g t1 p0 g' b1 ->
                In (mtch_pair t1 (empty_d_ev t1) b1)
-                  (M_ev g (t1, (p0, g')))) /\
+                  (Mev g (t1, (p0, g')))) /\
               (decompose_spec g t1 C' sub_t' p0 g' b1 ->
                exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                  In
                    (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1)
-                   (M_ev g (t1, (p0, g')))))
+                   (Mev g (t1, (p0, g')))))
          as Happ.
        {apply (H (t1, (p0, g'))
                  Hname_pat_rel
@@ -3030,7 +3030,7 @@ Module Completeness (pt : PatTermsSymb).
 
        assert(exists ev_decom : {sub_t' = t1 /\ C' = hole_contxt_c} + {subterm_rel sub_t' t1},
                  In (mtch_pair t1 (nonempty_d_ev t1 C' sub_t' ev_decom) b1)
-                    (M_ev g (t1, (p0, g'))))
+                    (Mev g (t1, (p0, g'))))
          as Hpair_Mev.
        {apply (Hexists_decom Hdecom).
        }
@@ -3048,7 +3048,7 @@ Module Completeness (pt : PatTermsSymb).
       exists ev_decom.
 
       assert(exists l1 l2,
-                M_ev g (t1, (p0, g')) = l1 ++
+                Mev g (t1, (p0, g')) = l1 ++
                              (mtch_pair t1
                                         (nonempty_d_ev t1 C' sub_t'
                                                        ev_decom) b1) :: l2)
@@ -3129,22 +3129,22 @@ Module Completeness (pt : PatTermsSymb).
 
   End Lemmas.
 
-  Ltac a_step := unfold M_ev;
+  Ltac a_step := unfold Mev;
                  rewrite Fix_eq;
-                 [(* func. ext. of M_ev_body *)
+                 [(* func. ext. of Mev_gen *)
                    apply fix_eq_fun_ext
-                 | unfold M_ev_body; 
+                 | unfold Mev_gen; 
                    simpl].
 
-  Theorem completeness_M : forall G1 G2 p t sub_t b C,
+  Theorem completeness_Mev : forall G1 G2 p t sub_t b C,
       (match_spec G1 t p G2 b ->
        In (mtch_pair t (empty_d_ev t) b)
-          (M_ev G1 (t, (p, G2))))
+          (Mev G1 (t, (p, G2))))
       /\
       (decompose_spec G1 t  C sub_t p G2 b ->
        exists (ev_decom : {sub_t = t /\ C = hole_contxt_c} + {subterm_rel sub_t t}),
          In (mtch_pair t (nonempty_d_ev t C sub_t ev_decom) b)
-            (M_ev G1 (t, (p, G2)))).
+            (Mev G1 (t, (p, G2)))).
   Proof.
     intros G1 G2 p t sub_t b C.
 
@@ -3158,12 +3158,12 @@ Module Completeness (pt : PatTermsSymb).
                    forall sub_t' b' C',
                      (match_spec G1 t' p' G2' b' ->
                       In (mtch_pair t' (empty_d_ev t') b')
-                        (M_ev G1 (t', (p', G2')))) /\
+                        (Mev G1 (t', (p', G2')))) /\
                        (decompose_spec G1 t' C' sub_t' p' G2' b' ->
                         exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                           In (mtch_pair t' (nonempty_d_ev t' C'
                                               sub_t' ev_decom) b')
-                            (M_ev G1 (t', (p', G2'))))
+                            (Mev G1 (t', (p', G2'))))
                end).
     * (* original goal *)
       apply (IP (t, (p, G2)) sub_t b C).
@@ -3175,12 +3175,12 @@ Module Completeness (pt : PatTermsSymb).
                    forall sub_t' b' C',
                      (match_spec G1 t' p' G2' b' ->
                       In (mtch_pair t' (empty_d_ev t') b')
-                         (M_ev G1 (t', (p', G2')))) /\
+                         (Mev G1 (t', (p', G2')))) /\
                      (decompose_spec G1 t' C' sub_t' p' G2' b' ->
                       exists ev_decom : {sub_t' = t' /\ C' = hole_contxt_c} + {subterm_rel sub_t' t'},
                         In (mtch_pair t' (nonempty_d_ev t' C'
                                                         sub_t' ev_decom) b')
-                           (M_ev G1 (t', (p', G2'))))
+                           (Mev G1 (t', (p', G2'))))
                  end) G1).
       intros [ t1 [p1 G'] ] H sub_t' b' C'.
       split.

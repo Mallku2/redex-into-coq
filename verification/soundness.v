@@ -24,13 +24,13 @@ Module Soundness (pt : PatTermsSymb).
   Import WfRel.
   Import GrammarLists.
 
-  Theorem soundness_M : forall G1 G2 p t sub_t b C,
+  Theorem soundness_Mev : forall G1 G2 p t sub_t b C,
       (In (mtch_pair t (empty_d_ev t) b)
-          (M_ev G1 (t, (p, G2))) ->
+          (Mev G1 (t, (p, G2))) ->
        G1 ⊢ t : p , G2 | b) /\
         (forall (ev_decom : {sub_t = t /\ C = hole_contxt_c} + {subterm_rel sub_t t}),
             In (mtch_pair t (nonempty_d_ev t C sub_t ev_decom) b)
-               (M_ev G1 (t, (p , G2))) ->
+               (Mev G1 (t, (p , G2))) ->
             G1 ⊢ t ⩦ C[sub_t] : p,  G2 | b).
    Proof.
      intros G1 G2 p t sub_t b C.
@@ -42,12 +42,12 @@ Module Soundness (pt : PatTermsSymb).
                | (t', (p', G2')) =>
                    forall sub_t b C,
                      (In (mtch_pair t' (empty_d_ev t') b)
-                        (M_ev G1 (t', (p', G2'))) ->
+                        (Mev G1 (t', (p', G2'))) ->
                       match_spec G1 t' p' G2' b) /\
                        (forall (ev_decom : {sub_t = t' /\ C = hole_contxt_c} + 
                                         {subterm_rel sub_t t'}),
                            In (mtch_pair t' (nonempty_d_ev t' C sub_t ev_decom) b)
-                             (M_ev G1 (t', (p' , G2'))) ->
+                             (Mev G1 (t', (p' , G2'))) ->
                            decompose_spec G1 t' C sub_t p' G2' b)
                end).
      - apply (IP (t, (p, G2)) sub_t b C).
@@ -59,7 +59,7 @@ Module Soundness (pt : PatTermsSymb).
        * (* match *)
          destruct p.
          + (* lit *)
-           M_ev_reduce.
+           Mev_reduce.
            destruct t.
            -- (* t = lit *)
               simpl.
@@ -78,7 +78,7 @@ Module Soundness (pt : PatTermsSymb).
               intro Hin.
               inversion Hin.
          + (* p = hole *)
-           M_ev_reduce.
+           Mev_reduce.
            destruct t.
            -- (* t = lit *)
               intro Hin.
@@ -124,11 +124,11 @@ Module Soundness (pt : PatTermsSymb).
            -- (* p = nil *)
               destruct t.
               ** (* t = lit *)
-                 M_ev_reduce.
+                 Mev_reduce.
                  simpl.
                  intuition.
               ** (* t = list term *)
-                 M_ev_reduce.
+                 Mev_reduce.
                  match goal with
                  | [l' : cons__t |-_] =>
                      destruct l'
@@ -142,13 +142,13 @@ Module Soundness (pt : PatTermsSymb).
                  ++ simpl.
                     intuition.
               ** (* t = contxt *)
-                 M_ev_reduce.
+                 Mev_reduce.
                  simpl.
                  intuition.
            -- (* p = cons pat *)
               destruct t as [ | | c].
               ** (* t = lit *)
-                 M_ev_reduce.
+                 Mev_reduce.
                  simpl.
                  intuition.
               ** (* t = list term *)
@@ -157,15 +157,15 @@ Module Soundness (pt : PatTermsSymb).
                      destruct l'
                  end.
                  ++ (* t = nil *)
-                    M_ev_reduce.
+                    Mev_reduce.
                     simpl.
                     intuition.
                  ++ (* t = cons *)
-                    generalize (M_ev_rew_cons_case G1 G2 t l0 p l).
+                    generalize (Mev_rew_cons_case G1 G2 t l0 p l).
                     intro Heq.
                     rewrite Heq.
                     intro Hin_cons.
-                    apply M_ev_cons_case_pair_in in Hin_cons.
+                    apply Mev_cons_case_pair_in in Hin_cons.
                     
                     inversion Hin_cons as [bl [br [Hb [Hin_l Hin_r] ] ] ].
                     
@@ -192,16 +192,16 @@ Module Soundness (pt : PatTermsSymb).
               ** (* contxt *)
                  destruct c as [ | l'].
                  --- (* c = hole *)
-                     M_ev_reduce.
+                     Mev_reduce.
                      intuition.
                  --- (* c = ctxt list *)
                      destruct l' as [c tl | hd c].
                      +++ (* hd_c c l0 *)
-                         generalize (M_ev_rew_cons_case_hd_ctxt G1 G2 c tl p l).
+                         generalize (Mev_rew_cons_case_hd_ctxt G1 G2 c tl p l).
                          intros [Hsubt Heq].
                          rewrite Heq.
                          intro Hin_cons.
-                         apply M_ev_cons_case_hd_contxt_pair_in in Hin_cons.                      
+                         apply Mev_cons_case_hd_contxt_pair_in in Hin_cons.                      
                          inversion Hin_cons as [bl [br [Hb [Hin_l Hin_r] ] ] ].
                          
                          assert(Hlt_l :
@@ -227,11 +227,11 @@ Module Soundness (pt : PatTermsSymb).
                          clear Hmtch_r.
                          eauto using match_spec.
                      +++ (* tail_c t tl *)
-                         generalize (M_ev_rew_cons_case_tail_ctxt G1 G2 hd c p l).
+                         generalize (Mev_rew_cons_case_tail_ctxt G1 G2 hd c p l).
                          intros [Hsubt Heq].
                          rewrite Heq.
                          intro Hin_cons.
-                         apply M_ev_cons_case_tail_contxt_pair_in in Hin_cons.                      
+                         apply Mev_cons_case_tail_contxt_pair_in in Hin_cons.                      
                          inversion Hin_cons as [bl [br [Hb [Hin_l Hin_r] ] ] ].
                          
                          assert(Hlt_l :
@@ -258,7 +258,7 @@ Module Soundness (pt : PatTermsSymb).
                          eauto using match_spec.
          + (* p = name p *)
            intro Hin.
-           apply M_ev_name_case_in in Hin.
+           apply Mev_name_case_in in Hin.
            inversion Hin as [b' [Hin' Hunion] ].
            clear Hin.
            assert(Hlt : matching_tuple_order G1 (t, (p, G2)) (t, (name v p, G2))).
@@ -271,7 +271,7 @@ Module Soundness (pt : PatTermsSymb).
            eauto using match_spec.
          + (* p = nt *)
            intro Hin.
-           apply M_ev_nt_case_in in Hin.
+           apply Mev_nt_case_in in Hin.
            inversion Hin as [p [proof [b' [Hin' Hb] ] ] ].
            clear Hin.
            assert(Hlt : matching_tuple_order G1 
@@ -287,7 +287,7 @@ Module Soundness (pt : PatTermsSymb).
            eauto using match_spec.
          + (* p = inhole *)
            intro H.
-           apply M_ev_inhole_case_in in H.
+           apply Mev_inhole_case_in in H.
            inversion H as [C' [subt [g3 [b1 [b2 [proof [Hin_left [Hin_right [Heq_t [Hsubt Hbunion] ] ] ] ] ] ] ] ] ].
            clear H.
            assert(Hlt_p1 : matching_tuple_order G1 
@@ -363,7 +363,7 @@ Module Soundness (pt : PatTermsSymb).
          destruct p as [ l | | l | |  | ].
          + (* lit *)
            intros ev_decom.
-           M_ev_reduce.
+           Mev_reduce.
            destruct t as [ l' | |].
            -- (* lit *)
               simpl.
@@ -386,7 +386,7 @@ Module Soundness (pt : PatTermsSymb).
               intuition.
          + (* hole *)
            intros ev_decom.
-           M_ev_reduce.
+           Mev_reduce.
            destruct t as [ l' | | c ].
            -- (* lit *)
               simpl.
@@ -408,7 +408,7 @@ Module Soundness (pt : PatTermsSymb).
            destruct l.
            -- (* nil *)
               intro ev_decom.
-              M_ev_reduce.
+              Mev_reduce.
               destruct t as [ | l | c].
               ++ (* lit *)
                  intro Hin.
@@ -427,19 +427,19 @@ Module Soundness (pt : PatTermsSymb).
               intro ev_decom.
               destruct t as [ | l' | c].
               ++ (* lit *)
-                 M_ev_reduce.
+                 Mev_reduce.
                  intuition.
               ++ (* list *)
                  destruct l'.
                  ** (* nil *)
-                    M_ev_reduce.
+                    Mev_reduce.
                     intuition.
                  ** (* list *)
-                    generalize (M_ev_rew_cons_case G1 G2 t l' p l).
+                    generalize (Mev_rew_cons_case G1 G2 t l' p l).
                     intros Heq.
                     rewrite Heq.
                     intro Hin_cons.
-                    apply M_ev_cons_case_nonempty_pair_in in Hin_cons.
+                    apply Mev_cons_case_nonempty_pair_in in Hin_cons.
                     
                     inversion Hin_cons as [bl [br [Hb [Hin_l | Hin_r] ] ] ].
                     --- (* empty dec on the left *)
@@ -494,16 +494,16 @@ Module Soundness (pt : PatTermsSymb).
               ++ (* contxt *)
                  destruct c as [ | l'].
                  ** (* c = hole *)
-                    M_ev_reduce.
+                    Mev_reduce.
                     intuition.
                  ** (* c = list c *)
                     destruct l'.
                     --- (* l' = hd *)
-                        generalize (M_ev_rew_cons_case_hd_ctxt G1 G2 c l0 p l).
+                        generalize (Mev_rew_cons_case_hd_ctxt G1 G2 c l0 p l).
                         intros [Hproof_subt Heq].
                         rewrite Heq.
                         intro Hin_cons.
-                        apply M_ev_cons_case_hd_contxt_nonempty_pair_in in Hin_cons.
+                        apply Mev_cons_case_hd_contxt_nonempty_pair_in in Hin_cons.
                         
                         inversion Hin_cons as [bl [br [Hb [Hin_l | Hin_r] ] ] ].
                         +++ (* empty dec on the left *)
@@ -559,11 +559,11 @@ Module Soundness (pt : PatTermsSymb).
                             rewrite Heq_C.
                             eauto using decompose_spec.
                     --- (* l' = hd *)
-                        generalize (M_ev_rew_cons_case_tail_ctxt G1 G2 t l' p l).
+                        generalize (Mev_rew_cons_case_tail_ctxt G1 G2 t l' p l).
                         intros [Hproof_subt Heq].
                         rewrite Heq.
                         intro Hin_cons.
-                        apply M_ev_cons_case_tail_contxt_nonempty_pair_in in Hin_cons.
+                        apply Mev_cons_case_tail_contxt_nonempty_pair_in in Hin_cons.
                         
                         inversion Hin_cons as [bl [br [Hb [Hin_l | Hin_r] ] ] ].
                         +++ (* empty dec on the left *)
@@ -620,7 +620,7 @@ Module Soundness (pt : PatTermsSymb).
                             eauto using decompose_spec.
          + (* name *)
            intros ev_decom Hin.
-           apply M_ev_name_non_empty_case_in in Hin.
+           apply Mev_name_non_empty_case_in in Hin.
            inversion Hin as [b' [Hin' Hunion] ].
            clear Hin.
            assert(Hlt : matching_tuple_order G1 (t, (p, G2)) (t, (name v p, G2))).
@@ -633,7 +633,7 @@ Module Soundness (pt : PatTermsSymb).
            eauto using decompose_spec.
          + (* nt *)
            intros ev_decom Hin.
-           apply M_ev_nt_non_empty_case_in in Hin.
+           apply Mev_nt_non_empty_case_in in Hin.
            inversion Hin as [p [proof [b' [Hin' Hb] ] ] ].
            clear Hin.
            assert(Hlt : matching_tuple_order G1 
@@ -649,7 +649,7 @@ Module Soundness (pt : PatTermsSymb).
            eauto using decompose_spec.
          + (* inhole *)
            intros ev_decom H.
-           apply M_ev_inhole_non_empty_case_in in H.
+           apply Mev_inhole_non_empty_case_in in H.
            inversion H as [C' [subt [g3 [C'' [b1 [b2 [proof1 [proof2 [Hin_left [Hin_right [Heq_t [Hsubt [Hbunion Heq_C] ] ] ] ] ] ] ] ] ] ] ] ].
            clear H.
            assert(Hlt_p1 : matching_tuple_order G1 

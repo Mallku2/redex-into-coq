@@ -29,9 +29,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   Import GrammarLists.
   
   (******************************)
-  (* general results about M_ev *)
+  (* general results about Mev *)
   (******************************)
-  (* function extensionality over recursive cases of M_ev (needed for Fix_eq) *)
+  (* function extensionality over recursive cases of Mev (needed for Fix_eq) *)
   Lemma fix_eq_fun_ext : 
     forall (g : grammar)
       (tup : matching_tuple)
@@ -39,11 +39,11 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           matching_tuple_order g tup' tup -> mtch_powset_ev (matching_tuple_term tup')),
       (forall (tup' : matching_tuple) (proof_lt : matching_tuple_order g tup' tup),
           f tup' proof_lt = f' tup' proof_lt) 
-      -> M_ev_body g tup f = M_ev_body g tup f'.
+      -> Mev_gen g tup f = Mev_gen g tup f'.
   Proof.
     intros g tup f f' H.
     destruct tup as [t [p g'] ].
-    unfold M_ev_body.
+    unfold Mev_gen.
     
     (* TODO: avoid doing this unfold... *)
     unfold matching_tuple_inverted.
@@ -60,10 +60,10 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       solve [reflexivity
             | destruct t;
               reflexivity
-            | ((unfold M_ev_fourth_eq) + 
-                (unfold M_ev_fourth_eq_l_context) +
-                (unfold M_ev_fourth_eq_r_context) +
-                (unfold M_ev_sixth_eq_trans2));
+            | ((unfold Mev_fourth_eq) + 
+                (unfold Mev_fourth_eq_l_context) +
+                (unfold Mev_fourth_eq_r_context) +
+                (unfold Mev_sixth_eq_trans2));
                 (rew_H H)].
 
     destruct p as [ | | l | | | ].
@@ -87,7 +87,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       finish H t.
     - (* nt *)
       repeat (rewrite <- eq_rect_eq).
-      unfold M_ev_seventh_eq_trans.
+      unfold Mev_seventh_eq_trans.
       unfold eq_rect_r.
       repeat (rewrite <- eq_rect_eq).
       unfold nt_case.
@@ -124,7 +124,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       rewrite H0.
       reflexivity.
     - (* name *)
-      unfold M_ev_fifth_eq.
+      unfold Mev_fifth_eq.
       repeat (rewrite <- eq_rect_eq).
       unfold eq_rec_r.
       repeat (rewrite <- eq_rec_eq).
@@ -147,12 +147,12 @@ Module MatchImplLemmas (pt : PatTermsSymb).
         reflexivity.
   Qed.
 
-  (* tactics useful to reason about M_ev *)
-  Ltac M_ev_reduce :=
-    unfold M_ev;
+  (* tactics useful to reason about Mev *)
+  Ltac Mev_reduce :=
+    unfold Mev;
     rewrite Fix_eq;
-    [unfold M_ev_body;
-     fold M_ev_body;
+    [unfold Mev_gen;
+     fold Mev_gen;
      simpl;
      unfold matching_tuple_term;
      simpl;
@@ -163,7 +163,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   
   Ltac M_reduce :=
     unfold M;
-    repeat (repeat M_ev_reduce;
+    repeat (repeat Mev_reduce;
             unfold eq_rec_r;
             repeat (rewrite <- Eqdep.EqdepTheory.eq_rec_eq);
             try (unfold inhole_case);
@@ -172,9 +172,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* lit pat *)
   (*******************)
-  Lemma M_ev_rew_lit_case : 
+  Lemma Mev_rew_lit_case : 
   forall (g1 g2 : grammar) (l : lit),
-    M_ev g1 (lit_term l, (lit_pat l, g2)) = 
+    Mev g1 (lit_term l, (lit_pat l, g2)) = 
       cons (mtch_pair (lit_term l)
                                (* case same literals: (∙, ∅) *)
                                (empty_d_ev (lit_term l))
@@ -182,7 +182,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                     nil.
   Proof.
     intros g1 g2 l.
-    M_ev_reduce.
+    Mev_reduce.
     destruct (lit_eq_dec l l) as [Heq | Hneq].
     - (* = *)
       unfold eq_rec_r.
@@ -199,9 +199,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* nil pat *)
   (*******************)
-  Lemma M_ev_rew_nil_case : 
+  Lemma Mev_rew_nil_case : 
   forall (g1 g2 : grammar),
-    M_ev g1 (list_term_c nil_term_c, (list_pat_c nil_pat_c, g2)) = 
+    Mev g1 (list_term_c nil_term_c, (list_pat_c nil_pat_c, g2)) = 
       cons (mtch_pair (list_term_c nil_term_c)
                      (* case same literals: (∙, ∅) *)
                      (empty_d_ev (list_term_c nil_term_c))
@@ -209,7 +209,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                nil.
   Proof.
     intros g1 g2.
-    M_ev_reduce.
+    Mev_reduce.
     unfold eq_rec_r.
     rewrite <- Eqdep.EqdepTheory.eq_rec_eq.
     reflexivity.
@@ -218,11 +218,11 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* hole pat *)
   (*******************)
-  Lemma M_ev_rew_hole_case : 
+  Lemma Mev_rew_hole_case : 
     forall (g1 g2 : grammar) (t : term),
     exists (ev_decom : {t = t /\ hole_contxt_c = hole_contxt_c} + {subterm_rel t t}),
       (t = contxt_term hole_contxt_c ->
-       (M_ev g1 (t, (hole_pat, g2))
+       (Mev g1 (t, (hole_pat, g2))
         =
         (mtch_pair t
                    (* returned value: ((hole, t), ∅) *)
@@ -231,7 +231,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           :: mtch_pair t (empty_d_ev t) nil
           :: nil)) /\
       (t <> contxt_term hole_contxt_c ->
-       (M_ev g1 (t, (hole_pat, g2))
+       (Mev g1 (t, (hole_pat, g2))
         =
         (cons (mtch_pair t
                          (* returned value: ((hole, t), ∅) *)
@@ -240,7 +240,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
               nil))).
   Proof.
     intros g1 g2 t.
-    unfold M_ev.
+    unfold Mev.
 
     Ltac split_solve :=
       simpl;
@@ -254,9 +254,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
         reflexivity].
 
     rewrite Fix_eq.
-    + (* app of fix M_ev is equal to one unfolding step, and hence,
+    + (* app of fix Mev is equal to one unfolding step, and hence,
          equals to cons (mtch_pair ... *)
-      unfold M_ev_body.
+      unfold Mev_gen.
       simpl.
       destruct t.
       - (* t = a *)
@@ -289,9 +289,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
        apply fix_eq_fun_ext.
   Qed.
 
-  Lemma M_ev_rew_hole_term_hole_case : 
+  Lemma Mev_rew_hole_term_hole_case : 
     forall (g1 g2 : grammar),
-       (M_ev g1 (contxt_term hole_contxt_c, (hole_pat, g2))
+       (Mev g1 (contxt_term hole_contxt_c, (hole_pat, g2))
         =
         (mtch_pair (contxt_term hole_contxt_c)
                    (* returned value: ((hole, t), ∅) *)
@@ -303,14 +303,14 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           :: nil).
     Proof.
       intros g1 g2.
-      M_ev_reduce.
+      Mev_reduce.
       reflexivity.
     Qed.
 
-    Lemma M_ev_rew_hole_term_nhole_case : 
+    Lemma Mev_rew_hole_term_nhole_case : 
     forall (g1 g2 : grammar) (t : term),
       (t <> contxt_term hole_contxt_c ->
-       (M_ev g1 (t, (hole_pat, g2))
+       (Mev g1 (t, (hole_pat, g2))
         =
         (cons (mtch_pair t
                          (* returned value: ((hole, t), ∅) *)
@@ -321,7 +321,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
               nil))).
   Proof.
     intros g1 g2 t H.
-    M_ev_reduce.
+    Mev_reduce.
     destruct t;
       solve [reflexivity
             | match goal with
@@ -360,16 +360,16 @@ Module MatchImplLemmas (pt : PatTermsSymb).
          reflexivity.
   Qed.
 
-  Lemma M_ev_rew_name_case : 
+  Lemma Mev_rew_name_case : 
     forall (g1 g2 : grammar) (t : term) (p : pat) (x : var),
-      M_ev g1 (t, (name_pat x p, g2))
+      Mev g1 (t, (name_pat x p, g2))
       =
       name_case (matching_tuple_term (t, (name_pat x p, g2)))
-                 (* TODO: check if we can get rid of M_ev_sixth_eq_trans2 *)
-                 (* (M_ev_sixth_eq_trans2 *)
+                 (* TODO: check if we can get rid of Mev_sixth_eq_trans2 *)
+                 (* (Mev_sixth_eq_trans2 *)
                  (*    (t, (name_pat x p, g2)) g1 g2 t p x eqp *)
-                 (*    (M_ev g1 (t, (p, g2)))) *)
-                 (M_ev g1 (t, (p, g2)))
+                 (*    (Mev g1 (t, (p, g2)))) *)
+                 (Mev g1 (t, (p, g2)))
                  x.
   Proof.
     intros.
@@ -377,11 +377,11 @@ Module MatchImplLemmas (pt : PatTermsSymb).
     simpl.
     remember (name_case _ _ _) as rhs eqn:Heq_rhs.
 
-    (* unfold M_ev. *)
-    unfold M_ev.
+    (* unfold Mev. *)
+    unfold Mev.
     rewrite Fix_eq.
     + (* Fixpoint def *)
-      unfold M_ev_body.
+      unfold Mev_gen.
       simpl.
       rewrite Heq_rhs.
       reflexivity.
@@ -390,46 +390,22 @@ Module MatchImplLemmas (pt : PatTermsSymb).
      apply fix_eq_fun_ext.
   Qed.
 
-  (*   intros. *)
-  (*   simpl. *)
-  (*   simpl in eqp. *)
-  (*   remember (name_case _ _ _) as rhs eqn:Heq_rhs. *)
-
-  (*   assert(Heq: eqp = eq_refl). *)
-  (*   {apply UIP_refl. *)
-  (*   } *)
-    
-  (*   rewrite Heq in Heq_rhs. *)
-    
-  (*   (* unfold M_ev. *) *)
-  (*   unfold M_ev. *)
-  (*   rewrite Fix_eq. *)
-  (*   + (* Fixpoint def *) *)
-  (*     unfold M_ev_body. *)
-  (*     simpl. *)
-  (*     rewrite Heq_rhs. *)
-  (*     reflexivity. *)
-  (*  + (* prove hypothesis of Fix_eq: function extensionality over recursive  *)
-  (*       cases *) *)
-  (*    apply fix_eq_fun_ext. *)
-  (* Qed. *)
-
-  Lemma M_ev_name_case_in : 
+  Lemma Mev_name_case_in : 
     forall (g1 g2 : grammar) (t : term) (p : pat) (v : var) (b : bindings),
-    In (mtch_pair t (empty_d_ev t) b) (M_ev g1 (t, (name v p, g2))) ->
-    exists b', In (mtch_pair t (empty_d_ev t) b') (M_ev g1 (t, (p, g2)))
+    In (mtch_pair t (empty_d_ev t) b) (Mev g1 (t, (name v p, g2))) ->
+    exists b', In (mtch_pair t (empty_d_ev t) b') (Mev g1 (t, (p, g2)))
           /\
           Some b = b_union ((v, (named t (empty_d_ev t))) :: nil) b'.
   Proof.
     intros g1 g2 t p v b H.
-    rewrite (M_ev_rew_name_case _ _ _ _ _) in H.
+    rewrite (Mev_rew_name_case _ _ _ _ _) in H.
     simpl in H.
-    unfold M_ev_sixth_eq_trans2 in H.
+    unfold Mev_sixth_eq_trans2 in H.
     unfold eq_rec_r in H.
     repeat (rewrite <- eq_rect_eq in H).
     repeat (rewrite <- eq_rec_eq in H).
     unfold name_case in H.
-    remember (M_ev g1 (t, (p, g2))) as rec_call eqn:Heq_rec_call.
+    remember (Mev g1 (t, (p, g2))) as rec_call eqn:Heq_rec_call.
     clear Heq_rec_call.
     induction rec_call as [ | hd tl IH].
     - (* rec_call = nil *)
@@ -481,24 +457,24 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           auto.
   Qed.
 
-  Lemma M_ev_name_non_empty_case_in : 
+  Lemma Mev_name_non_empty_case_in : 
     forall (g1 g2 : grammar) (t sub_t : term) (c : contxt) (p : pat) (v : var) 
       (ev_decom : {sub_t = t /\ c = hole__t} + {subterm_rel sub_t t}) (b : bindings),
-    In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b) (M_ev g1 (t, (name v p, g2))) ->
+    In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b) (Mev g1 (t, (name v p, g2))) ->
     exists b', In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b') 
-            (M_ev g1 (t, (p, g2)))
+            (Mev g1 (t, (p, g2)))
           /\
           Some b = b_union ((v, contxt_term c) :: ∅) b'.
   Proof.
     intros g1 g2 t sub_t c p v ev_decom b H.
-    rewrite (M_ev_rew_name_case _ _ _ _ _) in H.
+    rewrite (Mev_rew_name_case _ _ _ _ _) in H.
     simpl in H.
-    unfold M_ev_sixth_eq_trans2 in H.
+    unfold Mev_sixth_eq_trans2 in H.
     unfold eq_rec_r in H.
     repeat (rewrite <- eq_rect_eq in H).
     repeat (rewrite <- eq_rec_eq in H).
     unfold name_case in H.
-    remember (M_ev g1 (t, (p, g2))) as rec_call eqn:Heq_rec_call.
+    remember (Mev g1 (t, (p, g2))) as rec_call eqn:Heq_rec_call.
     clear Heq_rec_call.
     induction rec_call as [ | hd tl IH].
     - (* rec_call = nil *)
@@ -553,22 +529,22 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* nt pat *)
   (*******************)
-  Lemma M_ev_rew_nt_case :
+  Lemma Mev_rew_nt_case :
     forall (g1 g2 : grammar) (t : term) (n : nonterm),
-      M_ev g1 (t, (nt_pat n, g2))
+      Mev g1 (t, (nt_pat n, g2))
       =
       nt_case g1 g2 n t
                (fun (tpg2 : matching_tuple)
                   (_ : matching_tuple_order g1 tpg2 (t, (nt_pat n, g2)))
-                => M_ev g1 tpg2).
+                => Mev g1 tpg2).
   Proof.
     intros g1 g2 t n.
     remember (nt_case _ _ _ _ _) as rhs eqn:Heq_rhs.
-    unfold M_ev.
+    unfold Mev.
     rewrite Fix_eq.
     + (* fixpoint def. *)
-      unfold M_ev_body.
-      fold M_ev_body.
+      unfold Mev_gen.
+      fold Mev_gen.
       simpl.
       rewrite Heq_rhs.
       rewrite <- eq_rect_eq.
@@ -578,17 +554,17 @@ Module MatchImplLemmas (pt : PatTermsSymb).
        apply fix_eq_fun_ext.
   Qed.
 
-  Lemma M_ev_nt_case_in : 
+  Lemma Mev_nt_case_in : 
     forall (g1 g2 : grammar) (t : term) (n : nonterm) (b : bindings),
-    In (mtch_pair t (empty_d_ev t) b) (M_ev g1 (t, (nt n, g2))) ->
+    In (mtch_pair t (empty_d_ev t) b) (Mev g1 (t, (nt n, g2))) ->
     exists p (proof : prod_in_g (n, p) g2) b', 
       In (mtch_pair t (empty_d_ev t) b') 
-        (M_ev g1 (t, (p, remove_prod (n, p) g2 proof)))
+        (Mev g1 (t, (p, remove_prod (n, p) g2 proof)))
       /\
       b = ∅.
   Proof.
     intros g1 g2 t n b H.
-    rewrite M_ev_rew_nt_case in H.
+    rewrite Mev_rew_nt_case in H.
     unfold nt_case in H.
     induction (get_rhs g2 n) as [ | hd tl IH].
     - (* get_rhs g2 n = nil *)
@@ -601,7 +577,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       + (* In hd *)
         clear H.
         destruct hd as [p proof].
-        remember (M_ev g1 (t, (p, remove_prod (n, p) g2 proof)))
+        remember (Mev g1 (t, (p, remove_prod (n, p) g2 proof)))
           as rec_call eqn:Heq_rec_call.
         exists p.
         exists proof.
@@ -638,19 +614,19 @@ Module MatchImplLemmas (pt : PatTermsSymb).
         exact Hin_tail.
   Qed.
 
-  Lemma M_ev_nt_non_empty_case_in : 
+  Lemma Mev_nt_non_empty_case_in : 
     forall (g1 g2 : grammar) (t sub_t: term) (c : contxt) (n : nonterm) (b : bindings)
     (ev_decom : {sub_t = t /\ c = hole__t} + {subterm_rel sub_t t}),
     In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b) 
-      (M_ev g1 (t, (nt n, g2))) ->
+      (Mev g1 (t, (nt n, g2))) ->
     exists p (proof : prod_in_g (n, p) g2) b', 
       In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b') 
-        (M_ev g1 (t, (p, remove_prod (n, p) g2 proof)))
+        (Mev g1 (t, (p, remove_prod (n, p) g2 proof)))
       /\
       b = ∅.
   Proof.
     intros g1 g2 t sub_t c n b ev_decom H.
-    rewrite M_ev_rew_nt_case in H.
+    rewrite Mev_rew_nt_case in H.
     unfold nt_case in H.
     induction (get_rhs g2 n) as [ | hd tl IH].
     - (* get_rhs g2 n = nil *)
@@ -663,7 +639,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       + (* In hd *)
         clear H.
         destruct hd as [p proof].
-        remember (M_ev g1 (t, (p, remove_prod (n, p) g2 proof)))
+        remember (Mev g1 (t, (p, remove_prod (n, p) g2 proof)))
           as rec_call eqn:Heq_rec_call.
         exists p.
         exists proof.
@@ -703,26 +679,26 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* cons pat *)
   (*******************)
-  Lemma M_ev_rew_cons_case :
+  Lemma Mev_rew_cons_case :
     forall (g1 g2 : grammar) (tl : term) (tr : list_term) (pl : pat) (pr : list_pat),
-      M_ev g1 (ct tl tr, (cp pl pr, g2))
+      Mev g1 (ct tl tr, (cp pl pr, g2))
       =
         cons_case (ct tl tr) tl tr (build_subterm_proof tl tr)
-          (M_ev g1 (tl, (pl, g1)))
-          (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
+          (Mev g1 (tl, (pl, g1)))
+          (Mev g1 (list_term_c tr, (list_pat_c pr, g1))).
   Proof.
     intros g1 g2 tl tr pl pr.
-    unfold M_ev.
+    unfold Mev.
     rewrite Fix_eq.
-    - (* app of fix M_ev is equal to one unfolding step *)
-      unfold M_ev_body.
-      fold M_ev_body.
+    - (* app of fix Mev is equal to one unfolding step *)
+      unfold Mev_gen.
+      fold Mev_gen.
       simpl.
-      fold (M_ev g1 (tl, (pl, g1))).
-      fold (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
+      fold (Mev g1 (tl, (pl, g1))).
+      fold (Mev g1 (list_term_c tr, (list_pat_c pr, g1))).
       rewrite <- eq_rect_eq.
-      fold (M_ev g1 (tl, (pl, g1))).
-      fold (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
+      fold (Mev g1 (tl, (pl, g1))).
+      fold (Mev g1 (list_term_c tr, (list_pat_c pr, g1))).
       unfold eq_rec_r.
       repeat (rewrite <- eq_rec_eq).
       reflexivity.
@@ -731,23 +707,23 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       apply fix_eq_fun_ext.
   Qed.
 
-    Lemma M_ev_cons_case_aux_pair_in :
+    Lemma Mev_cons_case_aux_pair_in :
     forall (g1 : grammar) (tl : term) (tr : list_term)
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (ct tl tr) tl tr)
       (mtch_tl : mtch_ev tl),
       In (mtch_pair (ct tl tr) (empty_d_ev (ct tl tr)) b)
         (cons_case_aux (ct tl tr) tl tr proof_subt mtch_tl
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
         (mtch_tl = mtch_pair tl (empty_d_ev tl) bl)
         /\
-        (In (mtch_pair tr (empty_d_ev tr) br) (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))).
+        (In (mtch_pair tr (empty_d_ev tr) br) (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))).
     Proof.
       intros g1 tl tr pr b proof_subt mtch_tl.
-      remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) 
+      remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) 
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -858,7 +834,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                     exact Hin'.
     Qed.
 
-    Lemma M_ev_cons_case_aux_non_empty_pair_in :
+    Lemma Mev_cons_case_aux_non_empty_pair_in :
     forall (g1 : grammar) (tl subt : term) (tr : list_term) (c : contxt)
       (ev_decom : {subt = (ct tl tr) /\ c = hole__t} 
                                 + 
@@ -868,7 +844,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       (mtch_tl : mtch_ev tl),
       In (mtch_pair (ct tl tr) (nonempty_d_ev (ct tl tr) c subt ev_decom) b)
         (cons_case_aux (ct tl tr) tl tr proof_subt mtch_tl
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
@@ -876,18 +852,18 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 c = tail_c tl c'')
         \/
         (exists c' ev_decom_subt, 
             mtch_tl = mtch_pair tl (nonempty_d_ev tl c' subt ev_decom_subt) bl /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                c = hd_c c' tr)).
     Proof.
       intros g1 tl subt tr c ev_decom pr b proof_subt mtch_tl.
-      remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))
+      remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -1067,24 +1043,24 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                  eauto.
     Qed.
 
-    Lemma M_ev_cons_case_aux_hd_contxt_pair_in :
+    Lemma Mev_cons_case_aux_hd_contxt_pair_in :
     forall (g1 : grammar) (c : contxt) (tl : list_term)
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (hd_c c tl) c tl)
       (mtch_c : mtch_ev c),
       In (mtch_pair (hd_c c tl) (empty_d_ev (hd_c c tl)) b)
         (cons_case_aux (hd_c c tl) c tl proof_subt mtch_c
-           (M_ev g1 (list_term_c tl, (list_pat_c pr, g1)))) ->
+           (Mev g1 (list_term_c tl, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
         (mtch_c = mtch_pair c (empty_d_ev c) bl)
         /\
         (In (mtch_pair tl (empty_d_ev tl) br) 
-           (M_ev g1 (list_term_c tl, (list_pat_c pr, g1)))).
+           (Mev g1 (list_term_c tl, (list_pat_c pr, g1)))).
     Proof.
       intros g1 c tl pr b proof_subt mtch_c.
-      remember (M_ev g1 (list_term_c tl, (list_pat_c pr, g1))) 
+      remember (Mev g1 (list_term_c tl, (list_pat_c pr, g1))) 
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -1195,7 +1171,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                     exact Hin'.
     Qed.
 
-    Lemma M_ev_cons_case_aux_hd_non_empty_pair_in :
+    Lemma Mev_cons_case_aux_hd_non_empty_pair_in :
     forall (g1 : grammar) (subt : term) (c1 c2 : contxt) (tr : list_term)
       (ev_decom : {subt = (hd_c c1 tr) /\ c2 = hole__t} 
                                 + 
@@ -1205,7 +1181,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       (mtch_c1 : mtch_ev c1),
       In (mtch_pair (hd_c c1 tr) (nonempty_d_ev (hd_c c1 tr) c2 subt ev_decom) b)
         (cons_case_aux (hd_c c1 tr) c1 tr proof_subt mtch_c1
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
@@ -1213,19 +1189,19 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 c2 = tail_c c1 c'')
         \/
         (exists c' ev_decom_subt, 
             mtch_c1 = mtch_pair c1 (nonempty_d_ev c1 c' subt ev_decom_subt) bl /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                c2 = hd_c c' tr)).
     Proof.
       intros g1 subt c1 c2 tr ev_decom pr b proof_subt mtch_c1.
 
-      remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))
+      remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -1405,24 +1381,24 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                  eauto.
     Qed.
 
-    Lemma M_ev_cons_case_aux_tail_contxt_pair_in :
+    Lemma Mev_cons_case_aux_tail_contxt_pair_in :
     forall (g1 : grammar) (t : term) (tl : list_contxt)
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (tail_c t tl) t tl)
       (mtch_t : mtch_ev t),
       In (mtch_pair (tail_c t tl) (empty_d_ev (tail_c t tl)) b)
         (cons_case_aux (tail_c t tl) t tl proof_subt mtch_t
-           (M_ev g1 (contxt_term tl, (list_pat_c pr, g1)))) ->
+           (Mev g1 (contxt_term tl, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
         (mtch_t = mtch_pair t (empty_d_ev t) bl)
         /\
         (In (mtch_pair tl (empty_d_ev tl) br) 
-           (M_ev g1 (contxt_term tl, (list_pat_c pr, g1)))).
+           (Mev g1 (contxt_term tl, (list_pat_c pr, g1)))).
     Proof.
       intros g1 t tl pr b proof_subt mtch_t.
-      remember (M_ev g1 (contxt_term tl, (list_pat_c pr, g1))) 
+      remember (Mev g1 (contxt_term tl, (list_pat_c pr, g1))) 
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -1533,7 +1509,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                     exact Hin'.
     Qed.
 
-  Lemma M_ev_cons_case_aux_tail_non_empty_pair_in :
+  Lemma Mev_cons_case_aux_tail_non_empty_pair_in :
     forall (g1 : grammar) (t subt : term) (c : contxt) (tr : list_contxt)
       (ev_decom : {subt = (tail_c t tr) /\ c = hole__t} 
                                 + 
@@ -1543,7 +1519,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       (mtch_t : mtch_ev t),
       In (mtch_pair (tail_c t tr) (nonempty_d_ev (tail_c t tr) c subt ev_decom) b)
         (cons_case_aux (tail_c t tr) t tr proof_subt mtch_t
-           (M_ev g1 (contxt_term tr, (list_pat_c pr, g1)))) ->
+           (Mev g1 (contxt_term tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
@@ -1551,19 +1527,19 @@ Module MatchImplLemmas (pt : PatTermsSymb).
           exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 c = tail_c t c'')
         \/
         (exists c' ev_decom_subt, 
             mtch_t = mtch_pair t (nonempty_d_ev t c' subt ev_decom_subt) bl /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
                c = hd_c c' (list_contxt_2_list_term tr))).
     Proof.
       intros g1 t subt c tr ev_decom pr b proof_subt mtch_t.
 
-      remember (M_ev g1 (contxt_term tr, (list_pat_c pr, g1)))
+      remember (Mev g1 (contxt_term tr, (list_pat_c pr, g1)))
         as rrec_call eqn:Heq_rrec_call.
       clear Heq_rrec_call.
 
@@ -1743,25 +1719,25 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                  eauto.
   Qed.
 
-  Lemma M_ev_cons_case_pair_in :
+  Lemma Mev_cons_case_pair_in :
     forall (g1 : grammar) (tl : term) (tr : list_term) (pl : pat) 
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (ct tl tr) tl tr),
       In (mtch_pair (ct tl tr) (empty_d_ev (ct tl tr)) b)
-        (cons_case (ct tl tr) tl tr proof_subt (M_ev g1 (tl, (pl, g1))) 
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+        (cons_case (ct tl tr) tl tr proof_subt (Mev g1 (tl, (pl, g1))) 
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = bl ⊔ br 
         /\
-        (In (mtch_pair tl (empty_d_ev tl) bl) (M_ev g1 (tl, (pl, g1))))
+        (In (mtch_pair tl (empty_d_ev tl) bl) (Mev g1 (tl, (pl, g1))))
         /\
-        (In (mtch_pair tr (empty_d_ev tr) br) (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))).
+        (In (mtch_pair tr (empty_d_ev tr) br) (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))).
   Proof.
     intros g1 tl tr pl pr b proof_subt.
-    remember (M_ev g1 (tl, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    remember (Mev g1 (tl, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) 
+    remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) 
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -1788,7 +1764,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *) 
         rewrite Heq_rrec_call in Hin_cons_case_aux.
-        apply M_ev_cons_case_aux_pair_in in Hin_cons_case_aux.
+        apply Mev_cons_case_aux_pair_in in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Heq_mtch Hin] ] ] ].
         exists bl.
         exists br.
@@ -1821,7 +1797,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exact Hinr.
   Qed.
 
-  Lemma M_ev_cons_case_nonempty_pair_in :
+  Lemma Mev_cons_case_nonempty_pair_in :
     forall (g1 : grammar) (tl subt : term) (tr : list_term) (C : contxt) (pl : pat) 
       (pr : list_pat) (b : bindings) 
       (ev_decom : {subt = (ct tl tr) /\ C = hole__t} 
@@ -1829,35 +1805,35 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                   {pt.subterm_rel subt (ct tl tr)})
       (proof_subt : subterms (ct tl tr) tl tr),
       In (mtch_pair (ct tl tr) (nonempty_d_ev (ct tl tr) C subt ev_decom) b)
-        (cons_case (ct tl tr) tl tr proof_subt (M_ev g1 (tl, (pl, g1)))
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+        (cons_case (ct tl tr) tl tr proof_subt (Mev g1 (tl, (pl, g1)))
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
-        ((In (mtch_pair tl (empty_d_ev tl) bl) (M_ev g1 (tl, (pl, g1)))
+        ((In (mtch_pair tl (empty_d_ev tl) bl) (Mev g1 (tl, (pl, g1)))
           /\
           (exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 C = tail_c tl c''))
             \/
           (exists c' ev_decom_subt, 
               In (mtch_pair tl (nonempty_d_ev tl c' subt ev_decom_subt) bl)
-                (M_ev g1 (tl, (pl, g1)))
+                (Mev g1 (tl, (pl, g1)))
               /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
               C = hd_c c' tr)).
   Proof.
     intros g1 tl subt tr C pl pr b ev_decom proof_subt H.
-    generalize (M_ev_cons_case_aux_non_empty_pair_in g1 tl subt tr C ev_decom pr b proof_subt).
-    intro M_ev_cons_case.
-    remember (M_ev g1 (tl, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    generalize (Mev_cons_case_aux_non_empty_pair_in g1 tl subt tr C ev_decom pr b proof_subt).
+    intro Mev_cons_case.
+    remember (Mev g1 (tl, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))
+    remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -1892,7 +1868,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *)
         clear H.
-        apply M_ev_cons_case in Hin_cons_case_aux.
+        apply Mev_cons_case in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Hl | Hr] ] ] ].
         * (* empty dec on the left  *)
           clear Hin_cons_case_aux.
@@ -1959,26 +1935,26 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                 eauto.
   Qed.
 
-  Lemma M_ev_cons_case_hd_contxt_pair_in :
+  Lemma Mev_cons_case_hd_contxt_pair_in :
     forall (g1 : grammar) (c : contxt) (tl : list_term) (pl : pat) 
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (hd_c c tl) c tl),
       In (mtch_pair (hd_c c tl) (empty_d_ev (hd_c c tl)) b)
         (cons_case (hd_c c tl) c tl proof_subt 
-           (M_ev g1 (contxt_term c, (pl, g1))) 
-           (M_ev g1 (list_term_c tl, (list_pat_c pr, g1)))) ->
+           (Mev g1 (contxt_term c, (pl, g1))) 
+           (Mev g1 (list_term_c tl, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = bl ⊔ br 
         /\
-        (In (mtch_pair c (empty_d_ev c) bl) (M_ev g1 (contxt_term c, (pl, g1))))
+        (In (mtch_pair c (empty_d_ev c) bl) (Mev g1 (contxt_term c, (pl, g1))))
         /\
-        (In (mtch_pair tl (empty_d_ev tl) br) (M_ev g1 (list_term_c tl, (list_pat_c pr, g1)))).
+        (In (mtch_pair tl (empty_d_ev tl) br) (Mev g1 (list_term_c tl, (list_pat_c pr, g1)))).
   Proof.
     intros g1 c tl pl pr b proof_subt.
-    remember (M_ev g1 (contxt_term c, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    remember (Mev g1 (contxt_term c, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (list_term_c tl, (list_pat_c pr, g1))) 
+    remember (Mev g1 (list_term_c tl, (list_pat_c pr, g1))) 
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -2005,7 +1981,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *) 
         rewrite Heq_rrec_call in Hin_cons_case_aux.
-        apply M_ev_cons_case_aux_hd_contxt_pair_in in Hin_cons_case_aux.
+        apply Mev_cons_case_aux_hd_contxt_pair_in in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Heq_mtch Hin] ] ] ].
         exists bl.
         exists br.
@@ -2038,7 +2014,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exact Hinr.
   Qed.
 
-  Lemma M_ev_cons_case_hd_contxt_nonempty_pair_in :
+  Lemma Mev_cons_case_hd_contxt_nonempty_pair_in :
     forall (g1 : grammar) (subt : term) (c1 c2 : contxt) (tr : list_term)
       (ev_decom : {subt = (hd_c c1 tr) /\ c2 = hole__t} 
                                 + 
@@ -2047,35 +2023,35 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (hd_c c1 tr) c1 tr),
       In (mtch_pair (hd_c c1 tr) (nonempty_d_ev (hd_c c1 tr) c2 subt ev_decom) b)
-        (cons_case (hd_c c1 tr) c1 tr proof_subt (M_ev g1 (contxt_term c1, (pl, g1)))
-           (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
+        (cons_case (hd_c c1 tr) c1 tr proof_subt (Mev g1 (contxt_term c1, (pl, g1)))
+           (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
-        ((In (mtch_pair c1 (empty_d_ev c1) bl) (M_ev g1 (contxt_term c1, (pl, g1)))
+        ((In (mtch_pair c1 (empty_d_ev c1) bl) (Mev g1 (contxt_term c1, (pl, g1)))
           /\
           (exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 c2 = tail_c c1 c''))
             \/
           (exists c' ev_decom_subt, 
               In (mtch_pair c1 (nonempty_d_ev c1 c' subt ev_decom_subt) bl)
-                (M_ev g1 (contxt_term c1, (pl, g1)))
+                (Mev g1 (contxt_term c1, (pl, g1)))
               /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (list_term_c tr, (list_pat_c pr, g1))) /\
               c2 = hd_c c' tr)).
   Proof.
     intros g1 subt c1 c2 tr ev_decom pl pr b proof_subt H.
-    generalize (M_ev_cons_case_aux_hd_non_empty_pair_in g1 subt c1 c2 tr ev_decom pr b proof_subt).
-    intro M_ev_cons_case.
-    remember (M_ev g1 (contxt_term c1, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    generalize (Mev_cons_case_aux_hd_non_empty_pair_in g1 subt c1 c2 tr ev_decom pr b proof_subt).
+    intro Mev_cons_case.
+    remember (Mev g1 (contxt_term c1, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (list_term_c tr, (list_pat_c pr, g1)))
+    remember (Mev g1 (list_term_c tr, (list_pat_c pr, g1)))
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -2110,7 +2086,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *)
         clear H.
-        apply M_ev_cons_case in Hin_cons_case_aux.
+        apply Mev_cons_case in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Hl | Hr] ] ] ].
         * (* empty dec on the left  *)
           clear Hin_cons_case_aux.
@@ -2177,26 +2153,26 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                 eauto.
   Qed.
 
-  Lemma M_ev_cons_case_tail_contxt_pair_in :
+  Lemma Mev_cons_case_tail_contxt_pair_in :
     forall (g1 : grammar) (t : term) (tl : list_contxt) (pl : pat) 
       (pr : list_pat) (b : bindings) 
       (proof_subt : subterms (tail_c t tl) t tl),
       In (mtch_pair (tail_c t tl) (empty_d_ev (tail_c t tl)) b)
         (cons_case (tail_c t tl) t tl proof_subt 
-           (M_ev g1 (t, (pl, g1))) 
-           (M_ev g1 (contxt_term tl, (list_pat_c pr, g1)))) ->
+           (Mev g1 (t, (pl, g1))) 
+           (Mev g1 (contxt_term tl, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = bl ⊔ br 
         /\
-        (In (mtch_pair t (empty_d_ev t) bl) (M_ev g1 (t, (pl, g1))))
+        (In (mtch_pair t (empty_d_ev t) bl) (Mev g1 (t, (pl, g1))))
         /\
-        (In (mtch_pair tl (empty_d_ev tl) br) (M_ev g1 (contxt_term tl, (list_pat_c pr, g1)))).
+        (In (mtch_pair tl (empty_d_ev tl) br) (Mev g1 (contxt_term tl, (list_pat_c pr, g1)))).
   Proof.
     intros g1 t tl pl pr b proof_subt.
-    remember (M_ev g1 (t, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    remember (Mev g1 (t, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (contxt_term tl, (list_pat_c pr, g1))) 
+    remember (Mev g1 (contxt_term tl, (list_pat_c pr, g1))) 
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -2223,7 +2199,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *) 
         rewrite Heq_rrec_call in Hin_cons_case_aux.
-        apply M_ev_cons_case_aux_tail_contxt_pair_in in Hin_cons_case_aux.
+        apply Mev_cons_case_aux_tail_contxt_pair_in in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Heq_mtch Hin] ] ] ].
         exists bl.
         exists br.
@@ -2256,7 +2232,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exact Hinr.
   Qed.
 
-  Lemma M_ev_cons_case_tail_contxt_nonempty_pair_in :
+  Lemma Mev_cons_case_tail_contxt_nonempty_pair_in :
     forall (g1 : grammar) (t subt : term) (c : contxt) (tr : list_contxt)
       (ev_decom : {subt = (tail_c t tr) /\ c = hole__t} 
                                 + 
@@ -2267,36 +2243,36 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       In (mtch_pair (tail_c t tr) 
             (nonempty_d_ev (tail_c t tr) c subt ev_decom) b)
         (cons_case (tail_c t tr) t tr proof_subt 
-           (M_ev g1 (t, (pl, g1)))
-           (M_ev g1 (contxt_term tr, (list_pat_c pr, g1)))) ->
+           (Mev g1 (t, (pl, g1)))
+           (Mev g1 (contxt_term tr, (list_pat_c pr, g1)))) ->
       exists (bl br : bindings),
         Some b = (bl ⊔ br) 
         /\
-        ((In (mtch_pair t (empty_d_ev t) bl) (M_ev g1 (t, (pl, g1)))
+        ((In (mtch_pair t (empty_d_ev t) bl) (Mev g1 (t, (pl, g1)))
           /\
           (exists c' c'' ev_decom_subt, 
               In (mtch_pair tr (nonempty_d_ev tr c' subt
                                   ev_decom_subt) br) 
-                (M_ev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
                 c' = list_contxt_c c'' /\
                 c = tail_c t c''))
             \/
           (exists c' ev_decom_subt, 
               In (mtch_pair t (nonempty_d_ev t c' subt ev_decom_subt) bl)
-                (M_ev g1 (t, (pl, g1)))
+                (Mev g1 (t, (pl, g1)))
               /\
               In (mtch_pair tr (empty_d_ev tr) br) 
-                (M_ev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
+                (Mev g1 (contxt_term tr, (list_pat_c pr, g1))) /\
               c = hd_c c' (list_contxt_2_list_term tr))).
   Proof.
     intros g1 t subt c tr ev_decom pl pr b proof_subt H.
 
-    generalize (M_ev_cons_case_aux_tail_non_empty_pair_in g1 t subt c tr ev_decom pr b proof_subt).
-    intro M_ev_cons_case.
-    remember (M_ev g1 (t, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
+    generalize (Mev_cons_case_aux_tail_non_empty_pair_in g1 t subt c tr ev_decom pr b proof_subt).
+    intro Mev_cons_case.
+    remember (Mev g1 (t, (pl, g1))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
 
-    remember (M_ev g1 (contxt_term tr, (list_pat_c pr, g1)))
+    remember (Mev g1 (contxt_term tr, (list_pat_c pr, g1)))
       as rrec_call eqn:Heq_rrec_call.
 
     simpl in lrec_call.
@@ -2331,7 +2307,7 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       inversion H as [Hin_cons_case_aux | Hin_cons_case].
       + (* In cons_case_aux *)
         clear H.
-        apply M_ev_cons_case in Hin_cons_case_aux.
+        apply Mev_cons_case in Hin_cons_case_aux.
         inversion Hin_cons_case_aux as [bl [br [Hb [Hl | Hr] ] ] ].
         * (* empty dec on the left  *)
           clear Hin_cons_case_aux.
@@ -2398,24 +2374,24 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                 eauto.
   Qed.
   
-  Lemma M_ev_rew_cons_case_hd_ctxt :
+  Lemma Mev_rew_cons_case_hd_ctxt :
     forall (g1 g2 : grammar) (c : contxt) (tr : list_term) (pl : pat) (pr : list_pat),
       exists (proof_subt : subterms (ctxt (hd_c c tr)) (ctxt c) tr),
-        M_ev g1 (ctxt (hd_c c tr), (cp pl pr, g2))
+        Mev g1 (ctxt (hd_c c tr), (cp pl pr, g2))
         =
         cons_case (ctxt (hd_c c tr)) (ctxt c) tr proof_subt
-          (M_ev g1 (ctxt c, (pl, g1)))
-          (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
+          (Mev g1 (ctxt c, (pl, g1)))
+          (Mev g1 (list_term_c tr, (list_pat_c pr, g1))).
   Proof.
     intros g1 g2 c tr pl pr.
-    unfold M_ev.
+    unfold Mev.
     rewrite Fix_eq.
-    - (* app of fix M_ev is equal to one unfolding step *)
-      unfold M_ev_body.
-      fold M_ev_body.
+    - (* app of fix Mev is equal to one unfolding step *)
+      unfold Mev_gen.
+      fold Mev_gen.
       simpl.
-      fold (M_ev g1 (ctxt c, (pl, g1))).
-      fold (M_ev g1 (list_term_c tr, (list_pat_c pr, g1))).
+      fold (Mev g1 (ctxt c, (pl, g1))).
+      fold (Mev g1 (list_term_c tr, (list_pat_c pr, g1))).
       unfold eq_rect_r.
       simpl.
 
@@ -2430,23 +2406,23 @@ Module MatchImplLemmas (pt : PatTermsSymb).
       apply fix_eq_fun_ext.
   Qed.
 
-  Lemma M_ev_rew_cons_case_tail_ctxt :
+  Lemma Mev_rew_cons_case_tail_ctxt :
     forall (g1 g2 : grammar) (tl : term) (c : list_contxt) (pl : pat) (pr : list_pat),
       exists (proof_subt : subterms (ctxt (tail_c tl c)) tl (ctxt c)),
-        M_ev g1 (ctxt (tail_c tl c), (cp pl pr, g2))
+        Mev g1 (ctxt (tail_c tl c), (cp pl pr, g2))
         =
         (cons_case (ctxt (tail_c tl c)) tl (ctxt c) proof_subt
-                   (M_ev g1 (tl, (pl, g1)))
-                   (M_ev g1 (ctxt c, (list_pat_c pr, g1)))).
+                   (Mev g1 (tl, (pl, g1)))
+                   (Mev g1 (ctxt c, (list_pat_c pr, g1)))).
   Proof.
     intros g1 g2 tl c pl pr.
-    unfold M_ev.
+    unfold Mev.
     rewrite Fix_eq.
-    - (* app of fix M_ev is equal to one unfolding step *)
-      unfold M_ev_body.
-      fold M_ev_body.
-      fold (M_ev g1 (tl, (pl, g1))).
-      fold (M_ev g1 (ctxt c, (list_pat_c pr, g1))).
+    - (* app of fix Mev is equal to one unfolding step *)
+      unfold Mev_gen.
+      fold Mev_gen.
+      fold (Mev g1 (tl, (pl, g1))).
+      fold (Mev g1 (ctxt c, (list_pat_c pr, g1))).
       simpl.
       (* forced to use the same proof term for proof_subt, to guarantee
          equality afterwards *)
@@ -2462,24 +2438,24 @@ Module MatchImplLemmas (pt : PatTermsSymb).
   (*******************)
   (* inhole pat *)
   (*******************)
-  Lemma M_ev_rew_inhole_case :
+  Lemma Mev_rew_inhole_case :
     forall (g1 g2 : grammar) (t : term) (pc ph : pat),
-      M_ev g1 (t, (inhole_pat pc ph, g2))
+      Mev g1 (t, (inhole_pat pc ph, g2))
       =
       inhole_case t pc ph g1 g2
                   (fun (tpg2 : matching_tuple)
                      (_ : matching_tuple_order g1 
                             tpg2
                             (t, (inhole_pat pc ph, g2)))
-                   => M_ev g1 tpg2).
+                   => Mev g1 tpg2).
   Proof.
     intros g1 g2 t pc ph.
-    unfold M_ev.
+    unfold Mev.
     rewrite Fix_eq.
-    - (* app of fix M_ev is equal to one unfolding step *)
-      unfold M_ev_body.
+    - (* app of fix Mev is equal to one unfolding step *)
+      unfold Mev_gen.
       simpl.
-      fold M_ev_body.
+      fold Mev_gen.
       unfold eq_rect_r.
       simpl.
       repeat (rewrite <- eq_rect_eq).
@@ -2491,14 +2467,14 @@ Module MatchImplLemmas (pt : PatTermsSymb).
 
   (* inversion lemma for inhole case spec., in terms of 
      matching/decomposition algorithm *)
-  Lemma M_ev_inhole_case_in : 
+  Lemma Mev_inhole_case_in : 
     forall (g1 g2 : grammar) (t : term) (p1 p2 : pat) (b : bindings),
-    In (mtch_pair t (empty_d_ev t) b) (M_ev g1 (t, (inhole p1 p2, g2))) ->
+    In (mtch_pair t (empty_d_ev t) b) (Mev g1 (t, (inhole p1 p2, g2))) ->
     exists C subt g3 b1 b2 proof,
     In (mtch_pair t (nonempty_d_ev t C subt proof) b1)
-      (M_ev g1 (t, (p1, g2)))
+      (Mev g1 (t, (p1, g2)))
     /\
-    In (mtch_pair subt (empty_d_ev subt) b2) (M_ev g1 (subt, (p2, g3)))
+    In (mtch_pair subt (empty_d_ev subt) b2) (Mev g1 (subt, (p2, g3)))
     /\
     (t = subt -> g3 = g2 /\ subt = t /\ C = hole_contxt_c)
     /\
@@ -2507,9 +2483,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
     b1 ⊔ b2 = Some b.
   Proof.
     intros g1 g2 t p1 p2 b H.
-    rewrite M_ev_rew_inhole_case in H.
+    rewrite Mev_rew_inhole_case in H.
     unfold inhole_case in H.
-    remember (M_ev g1 (t, (p1, g2))) as lrec_call eqn:Heq_lrec_call.
+    remember (Mev g1 (t, (p1, g2))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
     induction lrec_call as [ | hdl tll IHl].
     - (* lrec_call = nil *)
@@ -2554,13 +2530,13 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exists subt.
              exists g2.
              rewrite Heq_t.
-             remember (M_ev g1 (t', (p2, g2))) as rcall eqn:Heq_rcall.
+             remember (Mev g1 (t', (p2, g2))) as rcall eqn:Heq_rcall.
              clear Heq_rcall.
              clear IHl.
              induction rcall as [ | hd tl IHtl].
-             ++ (* M_ev g1 (t', (p2, g2)) = nil *)
+             ++ (* Mev g1 (t', (p2, g2)) = nil *)
                 inversion Hin_hd.
-             ++ (* M_ev g1 (t', (p2, g2)) = hd :: tl *)
+             ++ (* Mev g1 (t', (p2, g2)) = hd :: tl *)
                 simpl in Hin_hd.
                 simpl in hd.
                 destruct hd as [t'' dec_r br].
@@ -2716,13 +2692,13 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exists C.
              exists subt.
              exists g1.
-             remember (M_ev g1 (subt, (p2, g1))) as rcall eqn:Heq_rcall.
+             remember (Mev g1 (subt, (p2, g1))) as rcall eqn:Heq_rcall.
              clear Heq_rcall.
              clear IHl.
              induction rcall as [ | hd tl IHtl].
-             ++ (* M_ev g1 (t', (p2, g2)) = nil *)
+             ++ (* Mev g1 (t', (p2, g2)) = nil *)
                 inversion Hin_hd.
-             ++ (* M_ev g1 (t', (p2, g2)) = hd :: tl *)
+             ++ (* Mev g1 (t', (p2, g2)) = hd :: tl *)
                 simpl in Hin_hd.
                 simpl in hd.
                 destruct hd as [t'' dec_r br].
@@ -2867,17 +2843,17 @@ Module MatchImplLemmas (pt : PatTermsSymb).
                            auto.
   Qed.
 
-  Lemma M_ev_inhole_non_empty_case_in : 
+  Lemma Mev_inhole_non_empty_case_in : 
     forall (g1 g2 : grammar) (t sub_t : term) (c : contxt) (p1 p2 : pat) (b : bindings)
       (ev_decom : {sub_t = t /\ c = hole__t} + {subterm_rel sub_t t}),
     In (mtch_pair t (nonempty_d_ev t c sub_t ev_decom) b) 
-      (M_ev g1 (t, (inhole p1 p2, g2))) ->
+      (Mev g1 (t, (inhole p1 p2, g2))) ->
     exists c' sub_t' g3 c'' b1 b2 proof1 proof2,
     In (mtch_pair t (nonempty_d_ev t c' sub_t' proof1) b1)
-      (M_ev g1 (t, (p1, g2)))
+      (Mev g1 (t, (p1, g2)))
     /\
     In (mtch_pair sub_t' (nonempty_d_ev sub_t' c'' sub_t proof2) b2) 
-      (M_ev g1 (sub_t', (p2, g3)))
+      (Mev g1 (sub_t', (p2, g3)))
     /\
     (t = sub_t' -> g3 = g2 /\ c' = hole_contxt_c)
     /\
@@ -2888,9 +2864,9 @@ Module MatchImplLemmas (pt : PatTermsSymb).
     c = context_com c' c''.
   Proof.
     intros g1 g2 t sub_t c p1 p2 b ev_decom H.
-    rewrite M_ev_rew_inhole_case in H.
+    rewrite Mev_rew_inhole_case in H.
     unfold inhole_case in H.
-    remember (M_ev g1 (t, (p1, g2))) as lrec_call eqn:Heq_lrec_call.
+    remember (Mev g1 (t, (p1, g2))) as lrec_call eqn:Heq_lrec_call.
     clear Heq_lrec_call.
     induction lrec_call as [ | hdl tll IHl].
     - (* lrec_call = nil *)
@@ -2938,13 +2914,13 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exists g2.
              exists c.
              rewrite Heq_t.
-             remember (M_ev g1 (t', (p2, g2))) as rcall eqn:Heq_rcall.
+             remember (Mev g1 (t', (p2, g2))) as rcall eqn:Heq_rcall.
              clear Heq_rcall.
              clear IHl.
              induction rcall as [ | hd tl IHtl].
-             ++ (* M_ev g1 (t', (p2, g2)) = nil *)
+             ++ (* Mev g1 (t', (p2, g2)) = nil *)
                 inversion Hin_hd.
-             ++ (* M_ev g1 (t', (p2, g2)) = hd :: tl *)
+             ++ (* Mev g1 (t', (p2, g2)) = hd :: tl *)
                 simpl in Hin_hd.
                 simpl in hd.
                 destruct hd as [t'' dec_r br].
@@ -3098,13 +3074,13 @@ Module MatchImplLemmas (pt : PatTermsSymb).
              exists C.
              exists subt.
              exists g1.
-             remember (M_ev g1 (subt, (p2, g1))) as rcall eqn:Heq_rcall.
+             remember (Mev g1 (subt, (p2, g1))) as rcall eqn:Heq_rcall.
              clear Heq_rcall.
              clear IHl.
              induction rcall as [ | hd tl IHtl].
-             ++ (* M_ev g1 (t', (p2, g2)) = nil *)
+             ++ (* Mev g1 (t', (p2, g2)) = nil *)
                 inversion Hin_hd.
-             ++ (* M_ev g1 (t', (p2, g2)) = hd :: tl *)
+             ++ (* Mev g1 (t', (p2, g2)) = hd :: tl *)
                 simpl in Hin_hd.
                 simpl in hd.
                 dependent destruction hd.
@@ -3245,14 +3221,14 @@ Module MatchImplLemmas (pt : PatTermsSymb).
 
   (* experimental evaluator using the previous lemmas as a general 
      memoization technique *)
-  Ltac M_ev_reduce_memo :=
-    repeat (rewrite M_ev_rew_inhole_case);
-    repeat (rewrite M_ev_rew_hole_term_hole_case);
-    repeat (rewrite M_ev_rew_hole_term_nhole_case);
-    repeat (rewrite M_ev_rew_name_case);
-    repeat (rewrite M_ev_rew_nt_case);
-    repeat (rewrite M_ev_rew_cons_case);
-    repeat (rewrite M_ev_rew_nil_case);
-    repeat (rewrite M_ev_rew_lit_case).
+  Ltac Mev_reduce_memo :=
+    repeat (rewrite Mev_rew_inhole_case);
+    repeat (rewrite Mev_rew_hole_term_hole_case);
+    repeat (rewrite Mev_rew_hole_term_nhole_case);
+    repeat (rewrite Mev_rew_name_case);
+    repeat (rewrite Mev_rew_nt_case);
+    repeat (rewrite Mev_rew_cons_case);
+    repeat (rewrite Mev_rew_nil_case);
+    repeat (rewrite Mev_rew_lit_case).
 
 End MatchImplLemmas.
