@@ -1,7 +1,7 @@
-# redex-into-coq
-Source code of Redex->Coq.
+# redex2coq
+Source code of Redex2Coq.
 
-This is the source code of Redex -> Coq: a tool to automate the
+This is the source code of Redex2Coq: a tool to automate the
 translation of Redex models into a (hopefully) semantically equivalent model in Coq,
 and to provide tactics to help in the certification of fundamental properties of such models.
 The work is heavily based on a model of Redex's semantics developed by 
@@ -35,5 +35,6 @@ In folder "examples/cbv" we offer a mechanization of a call-by-value lambda-calc
 
 Note that, in the present early state of the tool, the performance of matching/decomposition impedes testing with more interesting examples. Future iterations of the tool should improve performance, usability and capabilities of the tool.
 
- 
-[2] "Redex $\rightarrow$ Coq: towards a theory of decidability of Redex's reduction semantics"
+[1] Casey Klein, Jay McCarthy, Steven Jaconette and Robert Bruce Findler (2011). "A semantics for context-sensitive reduction semantics". In: APLAS’11.
+
+[2] Mallku Soldevila, Rodrigo Ribeiro and Beta Ziliani. "Redex $\rightarrow$ Coq: towards a theory of decidability of Redex's reduction semantics". In pre-print.
