@@ -27,7 +27,7 @@ The content of the verification folder includes:
 + match_spec_equiv.v             : mechanical proofs of correspondence between the original specifications of matching/decomposition and our modified versions (section 4).
 + completeness.v and soundness.v : mechanized proofs of completeness and soundness of the matching/decomposition algorithm, respectively, with respect to its specification (section 4).
 
-In folder "examples/cbv" we offer a mechanization of a call-by-value lambda-calculus with normal-order reduction. It serves mainly to showcase the actual capabilities of Redex that are mechanized in the present version of the tool, and how to invoke them to implement a reduction-semantics model:
+In folder "examples/cbv" we offer a mechanization of a lambda-calculus with normal-order reduction. It serves mainly to showcase the actual capabilities of Redex that are mechanized in the present version of the tool, and how to invoke them to implement a reduction-semantics model:
 + cbv_grammar.v        : defines the language of lambda-terms.
 + cbv_sem.v            : implements a call-by-value beta-contraction.
 + cbv_meta_functions.v : implements capture-avoiding substitution and defines the notion of "free-variables" in lambda-terms.
