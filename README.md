@@ -33,7 +33,7 @@ In folder "examples/cbv" we offer a mechanization of a lambda-calculus with norm
 + cbv_meta_functions.v : implements capture-avoiding substitution and defines the notion of "free-variables" in lambda-terms.
 + cbv_tests.v          : implements several simple tests cases to illustrates the capabilities of the model.
 
-Note that, in the present early state of the tool, the performance of matching/decomposition impedes testing with more interesting examples. Future iterations of the tool should improve performance, usability and capabilities of the tool.
+Note that, in the present early stage of the tool, the performance of matching/decomposition impedes testing with more interesting examples. Future iterations of the tool should improve performance, usability and capabilities of the tool.
 
 [1] Casey Klein, Jay McCarthy, Steven Jaconette and Robert Bruce Findler (2011). "A semantics for context-sensitive reduction semantics". In: APLAS’11.
 
