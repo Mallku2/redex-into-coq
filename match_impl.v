@@ -1189,7 +1189,7 @@ Module Matching(pt : PatTermsSymb).
          (Mev2 : forall tpg2 : matching_tuple,
              matching_tuple_order g1 tpg2 tpg1 ->
              mtch_powset_ev (matching_tuple_term tpg2)) =>
-         match (matching_tuple_inverted tpg1) as tpg1'
+         match matching_tuple_inverted tpg1 as tpg1'
                (* changing order of members of tpg1, to obtain a  *)
                (* function that matches, first, over the pattern: it *)
                (* helps in obtaining shorter proofs *)
