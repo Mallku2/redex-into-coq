@@ -37,4 +37,4 @@ Note that, in the present early state of the tool, the performance of matching/d
 
 [1] Casey Klein, Jay McCarthy, Steven Jaconette and Robert Bruce Findler (2011). "A semantics for context-sensitive reduction semantics". In: APLAS’11.
 
-[2] Mallku Soldevila, Rodrigo Ribeiro and Beta Ziliani. "Redex $\rightarrow$ Coq: towards a theory of decidability of Redex's reduction semantics". In pre-print.
+[2] Mallku Soldevila, Rodrigo Ribeiro and Beta Ziliani. "Redex2Coq: towards a theory of decidability of Redex's reduction semantics". In pre-print. Sent for revision to the [Fifteenth Conference on Interactive Theorem Proving, ITP'24](https://www.viam.science.tsu.ge/itp2024/).
