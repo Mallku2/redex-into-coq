@@ -1,7 +1,7 @@
-# redex-into-coq
-Source code of Redex->Coq.
+# redex2coq
+Source code of Redex2Coq.
 
-This is the source code of Redex -> Coq: a tool to automate the
+This is the source code of Redex2Coq: a tool to automate the
 translation of Redex models into a (hopefully) semantically equivalent model in Coq,
 and to provide tactics to help in the certification of fundamental properties of such models.
 The work is heavily based on a model of Redex's semantics developed by 
