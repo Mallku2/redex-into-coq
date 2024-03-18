@@ -1,5 +1,5 @@
 # redex2coq
-Source code of Redex2Coq.
+# Source code of Redex2Coq
 
 This is the source code of Redex2Coq: a tool to automate the
 translation of Redex models into a semantically equivalent model in Coq,
@@ -26,6 +26,15 @@ The content of the verification folder includes:
 + match_spec_lemmas.v            : results about our modified formal system that specifies matching and decomposition (section 4).
 + match_spec_equiv.v             : mechanical proofs of correspondence between the original specifications of matching/decomposition and our modified versions (section 4).
 + completeness.v and soundness.v : mechanized proofs of completeness and soundness of the matching/decomposition algorithm, respectively, with respect to its specification (section 4).
+
+# Compilation
+To compile the whole project just type the following, within the root directory:
+
+`make -f CoqMakefile`
+
+The present version is compatible with Coqc version 8.18.0.
+
+# Examples
 
 In folder "examples/cbv" we offer a mechanization of a lambda-calculus with normal-order reduction. It serves mainly to showcase the actual capabilities of Redex that are mechanized in the present version of the tool, and how to invoke them to implement a reduction-semantics model:
 + cbv_grammar.v        : defines the language of lambda-terms.
