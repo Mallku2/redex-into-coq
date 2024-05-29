@@ -30,9 +30,13 @@ The content of the verification folder includes:
 # Compilation
 To compile the whole project just type the following, within the root directory:
 
-`make -f CoqMakefile`
+`coq_makefile -f _CoqProject > Makefile`
 
-The present version is compatible with Coqc version 8.18.0.
+and then `make`.
+
+# Requisites
+
+The present version is compatible with `coqc` version 8.18.0, and requires [stdpp](https://gitlab.mpi-sws.org/iris/stdpp).
 
 # Examples
 
